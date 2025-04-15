@@ -1,0 +1,94 @@
+diff --git a/node_modules/react-native-scrollable-tab-view/.DS_Store b/node_modules/react-native-scrollable-tab-view/.DS_Store
+new file mode 100644
+index 0000000..5008ddf
+Binary files /dev/null and b/node_modules/react-native-scrollable-tab-view/.DS_Store differ
+diff --git a/node_modules/react-native-scrollable-tab-view/index.js b/node_modules/react-native-scrollable-tab-view/index.js
+index 82e53c5..4a29265 100644
+--- a/node_modules/react-native-scrollable-tab-view/index.js
++++ b/node_modules/react-native-scrollable-tab-view/index.js
+@@ -13,9 +13,8 @@ const {
+   InteractionManager,
+ } = ReactNative;
+ 
+-const ViewPagerAndroid = require('@react-native-community/viewpager');
+ const TimerMixin = require('react-timer-mixin');
+-const ViewPager = require('@react-native-community/viewpager');
++const ViewPager = require('react-native-pager-view');
+ 
+ const SceneComponent = require('./SceneComponent');
+ const DefaultTabBar = require('./DefaultTabBar');
+@@ -134,21 +133,12 @@ const ScrollableTabView = createReactClass({
+   },
+ 
+   goToPage(pageNumber) {
+-    if (Platform.OS === 'ios') {
+-      const offset = pageNumber * this.state.containerWidth;
+-      if (this.scrollView) {
+-        this.scrollView.getNode().scrollTo({x: offset, y: 0, animated: !this.props.scrollWithoutAnimation, });
+-      }
+-    } else {
+-      if (this.scrollView) {
+-        if (this.props.scrollWithoutAnimation) {
+-          this.scrollView.getNode().setPageWithoutAnimation(pageNumber);
+-        } else {
+-          this.scrollView.getNode().setPage(pageNumber);
+-        }
+-      }
++    const offset = pageNumber * this.state.containerWidth;
++    if (this.scrollView) {
++      this.scrollView.scrollTo({x: offset, y: 0, animated: !this.props.scrollWithoutAnimation, });
+     }
+    
++
+     const currentPage = this.state.currentPage;
+     this.updateSceneKeys({
+       page: pageNumber,
+@@ -250,30 +240,26 @@ const ScrollableTabView = createReactClass({
+       </Animated.ScrollView>;
+     } else {
+       const scenes = this._composeScenes();
+-      return <AnimatedViewPagerAndroid
+-        key={this._children().length}
+-        style={styles.scrollableContentAndroid}
+-        initialPage={this.props.initialPage}
+-        onPageSelected={this._updateSelectedPage}
+-        keyboardDismissMode="on-drag"
+-        scrollEnabled={!this.props.locked}
+-        onPageScroll={Animated.event(
+-          [{
+-            nativeEvent: {
+-              position: this.state.positionAndroid,
+-              offset: this.state.offsetAndroid,
+-            },
+-          }, ],
+-          {
+-            useNativeDriver: true,
+-            listener: this._onScroll,
+-          },
+-        )}
+-        ref={(scrollView) => { this.scrollView = scrollView; }}
+-        {...this.props.contentProps}
++     
++      return <ScrollView
++      horizontal
++      pagingEnabled
++      automaticallyAdjustContentInsets={false}
++      contentOffset={{ x: this.props.initialPage * this.state.containerWidth, }}
++      ref={(scrollView) => { this.scrollView = scrollView; }}
++      onMomentumScrollBegin={this._onMomentumScrollBeginAndEnd}
++      onMomentumScrollEnd={this._onMomentumScrollBeginAndEnd}
++      scrollEventThrottle={16}
++      scrollsToTop={false}
++      showsHorizontalScrollIndicator={false}
++      scrollEnabled={!this.props.locked}
++      directionalLockEnabled
++      alwaysBounceVertical={false}
++      keyboardDismissMode="on-drag"
++      {...this.props.contentProps}
+       >
+         {scenes}
+-      </AnimatedViewPagerAndroid>;
++      </ScrollView>
+     }
+   },
+ 
