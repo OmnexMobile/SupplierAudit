@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>363640769683-o6k14vc4a3l1hqm0til1f7pdmbhta2nj.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.363640769683-o6k14vc4a3l1hqm0til1f7pdmbhta2nj</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDDiOioSN_ubo1xdKZoPPULbAxq6vBVBL8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>363640769683</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.hubino.AuditPro</string>
+	<key>PROJECT_ID</key>
+	<string>auditpro-90ecf</string>
+	<key>STORAGE_BUCKET</key>
+	<string>auditpro-90ecf.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:363640769683:ios:e12beaff4daf46a7</string>
+	<key>DATABASE_URL</key>
+	<string>https://auditpro-90ecf.firebaseio.com</string>
+</dict>
+</plist>
