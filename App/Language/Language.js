@@ -176,6 +176,7 @@ export let strings = new LocalizedStrings({
     Edit: "Edit",
     /** Create NC */
     ClausesL: "Clause",
+    NoClausesFound: "No clause data available.",
     Opportunity_ApproachL: "Opportunity for improvements",
     DepartmentL: "Department",
     FailureCategory: "Failure Category",
@@ -859,6 +860,7 @@ export let strings = new LocalizedStrings({
     OFI_Desc: "OFI描述",
     /** Create NC */
     ClausesL: "条款",
+    NoClausesFound: "没有可用的条款。",
     DepartmentL: "部门",
     Auditee_Approach: "受审计方法",
     Attach_EvidenceL: "添加文件",

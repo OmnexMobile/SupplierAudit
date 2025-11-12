@@ -7494,7 +7494,7 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                   ) : null}
                                 </View> */}
                                 
-  {this.state.checkPointsDetails[index].Score == -1 || this.state.checkPointsDetails[index].Score == 2 || this.state.checkPointsDetails[index].Score == 'N/A' || this.state.checkPointsDetails[index].Score == -2 ? null:<>{
+  {this.state.checkPointsDetails[index].Score == -1 || this.state.checkPointsDetails[index].Score == 2 || this.state.checkPointsDetails[index].Score == 'N/A' || this.state.checkPointsDetails[index].Score == -2 || this.state.checkPointsDetails[index].ncOFIStatus == 4 ? null:<>{
                                     item.scoreType == 3 &&
                                     this.state.checkPointsDetails[index].Score !==
                                       '' &&
@@ -7534,7 +7534,7 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                           color: 'white',
                                           fontFamily: 'OpenSans-Regular',
                                         }}>
-                                        NC/OFI
+                                        NC/OFI4
                                        </Text>
                                    </TouchableOpacity>
                                   </View></>
