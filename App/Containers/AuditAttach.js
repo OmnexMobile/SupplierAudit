@@ -33,6 +33,7 @@ import {strings} from '../Language/Language';
 import NetInfo from '@react-native-community/netinfo';
 import RNFetchBlob from 'react-native-fetch-blob';
 import FileViewer from 'react-native-file-viewer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let Window = Dimensions.get('window');
 
@@ -115,7 +116,7 @@ class AuditAttach extends React.Component {
         this.refs.toast.show(strings.Offline_Notice, DURATION.LENGTH_SHORT);
       });
     } else {
-      NetInfo.fetch().then(isConnected => {
+      NetInfo.fetch().then(async isConnected => {
         if (isConnected.isConnected) {
           var auditRecords = this.props.data.audits.auditRecords;
           var Token = this.props.data.audits.token;
@@ -125,6 +126,14 @@ class AuditAttach extends React.Component {
           var RequestParam = [];
 
           var auditRecords = this.props.data.audits.auditRecords;
+console.log('checkthewebtodocdetailsauditRecords.....',auditRecords);
+          
+   var AUDITPROG_ID = await AsyncStorage.getItem('AUDITPROG_ID');
+    var AUDITYPE_ORDER = await AsyncStorage.getItem('AUDITYPE_ORDER');
+   var AUDITYPE_ID = await AsyncStorage.getItem('AUDITYPE_ID');
+    var AUDITPROGORDER = await AsyncStorage.getItem('AUDITPROGORDER');
+    console.log('checkconnectionnnn',AUDITPROG_ID,AUDITYPE_ORDER,AUDITYPE_ID,AUDITPROGORDER);
+    
           for (var i = 0; i < auditRecords.length; i++) {
             if (this.state.AuditID === auditRecords?.[i]?.AuditId) {
               console.log(
@@ -132,7 +141,19 @@ class AuditAttach extends React.Component {
                 auditRecords?.[i]?.AuditId,
                 this.state.AuditID,
               );
-              RequestParam.push({
+              if(auditRecords?.[i]?.AuditProgramId == undefined){
+                console.log('checking the programid----iffffff');
+                RequestParam.push({
+                AuditId: auditRecords?.[i]?.AuditId,
+                AuditProgramId: AUDITPROG_ID,
+                AuditProgramOrder: auditRecords?.[i]?.AuditProgOrder,
+                AuditTypeOrder: auditRecords?.[i]?.AuditTypeOrder,
+                AuditTypeId: auditRecords?.[i]?.AuditTypeId,
+                AuditOrder: auditRecords?.[i]?.AuditTypeOrder,
+              });
+              }else{
+                console.log('checking the programid----eelseeeee');
+                 RequestParam.push({
                 AuditId: auditRecords?.[i]?.AuditId,
                 AuditProgramId: auditRecords?.[i]?.AuditProgramId,
                 AuditProgramOrder: auditRecords?.[i]?.AuditProgOrder,
@@ -140,6 +161,8 @@ class AuditAttach extends React.Component {
                 AuditTypeId: auditRecords?.[i]?.AuditTypeId,
                 AuditOrder: auditRecords?.[i]?.AuditOrderId,
               });
+              }
+             
             }
           }
           console.log('RequestParam-->', RequestParam);
@@ -159,7 +182,7 @@ class AuditAttach extends React.Component {
             Request: Request,
             SiteId: SiteId,
           });
-          console.log('Param-->', param);
+          console.log('Param-->Attach', param);
 
           auth.getStatusHistory(param, Token, (res, data) => {
             console.log('response', data, param, Token);

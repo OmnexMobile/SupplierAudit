@@ -34,6 +34,7 @@ import {Dropdown} from 'react-native-element-dropdown';
 import {debounce, once} from 'underscore';
 import DeviceInfo from 'react-native-device-info';
 import RNFS from 'react-native-fs';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let Window = Dimensions.get('window');
 
@@ -420,7 +421,7 @@ class CreateAttach extends React.Component {
           {
             isErrorFound: false,
           },
-          () => {
+          async () => {
             var auditRecords = this.props.data.audits.auditRecords;
             var Token = this.props.data.audits.token;
             var SiteId = this.props.data.audits.siteId;
@@ -428,6 +429,12 @@ class CreateAttach extends React.Component {
             var RequestParam = [];
 
             var auditRecords = this.props.data.audits.auditRecords;
+             var AUDITPROG_ID = await AsyncStorage.getItem('AUDITPROG_ID');
+                var AUDITYPE_ORDER = await AsyncStorage.getItem('AUDITYPE_ORDER');
+               var AUDITYPE_ID = await AsyncStorage.getItem('AUDITYPE_ID');
+                var AUDITPROGORDER = await AsyncStorage.getItem('AUDITPROGORDER');
+                console.log('checkconnectionnnncreateAttach',AUDITPROG_ID,AUDITYPE_ORDER,AUDITYPE_ID,AUDITPROGORDER);
+                
             for (var i = 0; i < auditRecords.length; i++) {
               if (this.state.AuditID === auditRecords[i].AuditId) {
                 console.log(
@@ -435,17 +442,30 @@ class CreateAttach extends React.Component {
                   auditRecords[i].AuditId,
                   this.state.AuditID,
                 );
+                 if(auditRecords?.[i]?.AuditProgramId == undefined){
+                console.log('checking the programid----iffffffcreateattach');
                 RequestParam.push({
-                  AuditId: auditRecords[i].AuditId,
-                  AuditProgramId: auditRecords[i].AuditProgramId,
-                  AuditProgramOrder: auditRecords[i].AuditProgOrder,
-                  AuditTypeOrder: auditRecords[i].AuditTypeOrder,
-                  AuditTypeId: auditRecords[i].AuditTypeId,
-                  AuditOrder: auditRecords[i].AuditOrderId,
-                });
+                AuditId: auditRecords?.[i]?.AuditId,
+                AuditProgramId: AUDITPROG_ID,
+                AuditProgramOrder: auditRecords?.[i]?.AuditProgOrder,
+                AuditTypeOrder: auditRecords?.[i]?.AuditTypeOrder,
+                AuditTypeId: auditRecords?.[i]?.AuditTypeId,
+                AuditOrder: auditRecords?.[i]?.AuditTypeOrder,
+              });
+              }else{
+                console.log('checking the programid----eelseeeeecreateattach');
+                 RequestParam.push({
+                AuditId: auditRecords?.[i]?.AuditId,
+                AuditProgramId: auditRecords?.[i]?.AuditProgramId,
+                AuditProgramOrder: auditRecords?.[i]?.AuditProgOrder,
+                AuditTypeOrder: auditRecords?.[i]?.AuditTypeOrder,
+                AuditTypeId: auditRecords?.[i]?.AuditTypeId,
+                AuditOrder: auditRecords?.[i]?.AuditOrderId,
+              });
+              }
               }
             }
-            console.log('RequestParam-->', RequestParam);
+            console.log('RequestParam-->createattach', RequestParam);
 
             var Request =
               RequestParam[0].AuditId +
@@ -457,6 +477,7 @@ class CreateAttach extends React.Component {
               RequestParam[0].AuditTypeId +
               '_' +
               RequestParam[0].AuditOrder;
+              console.log('checkkkkkkk212121createattach',Request);
             var param = [];
             if (this.state.TypeID == 1) {
               param.push({

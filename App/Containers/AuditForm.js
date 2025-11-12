@@ -46,6 +46,7 @@ import * as constant from '../Constants/AppConstants';
 import DeviceInfo from 'react-native-device-info';
 import Moment from 'moment';
 import constants from '../Constants/AppConstants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let Window = Dimensions.get('window');
 
@@ -98,10 +99,12 @@ class AuditForm extends Component {
       generarereport_param: '',
       auditObj: '',
       loopCount: 0,
+      AUDITPROG_ID: '',
     };
   }
 
   componentWillMount() {
+    this.getparamsDetails();
     DeviceInfo.getUniqueId().then(deviceId => {
       this.setState({
         deviceId,
@@ -122,7 +125,15 @@ class AuditForm extends Component {
       }
     }
   }
+async getparamsDetails(){
+       let auditProgId = await AsyncStorage.getItem('AUDITPROG_ID');
 
+   console.log('cchecjlldllflsj',auditProgId);
+   
+   this.setState({
+      AUDITPROG_ID: auditProgId
+   })
+}
   componentDidMount() {
     // this.getParamsDetails();
     let Files =
@@ -727,7 +738,7 @@ class AuditForm extends Component {
                   FormId: parseInt(FormIds[kk]), //parseInt(audits[i].Listdata[j].FormId),
                   //FormId:this.props.navigation.state.params.ChecklistHeading.FormId,
                   AuditId: parseInt(audits[i].AuditId),
-                  AuditProgramId: this.props.data.audits.smdata == 2 ? -2 : parseInt(audits[i].AuditTemplateId),
+                  AuditProgramId: this.props.data.audits.smdata == 2 ? -2 : this.state.AUDITPROG_ID,
                   AuditTypeId: parseInt(audits[i].AuditTypeId),
                   AuditOrderId: parseInt(audits[i].AuditTypeOrder),
                   SiteId: parseInt(audits[i].SiteId),
@@ -1650,7 +1661,7 @@ class AuditForm extends Component {
         AuditTypeOrder: auditRecordsOrg[p].AuditTypeOrder,
         AuditId: auditRecordsOrg[p].AuditId,
         AuditOrderId: auditRecordsOrg[p].AuditTypeOrder,
-        AuditProgramId: this.props.data.audits.smdata == 2 ? -2 : auditRecordsOrg[p].AuditTemplateId,
+        AuditProgramId: this.props.data.audits.smdata == 2 ? -2 : this.state.AUDITPROG_ID,
         AuditTypeId: auditRecordsOrg[p].AuditTypeId,
         SiteId: auditRecordsOrg[p].SiteId,
         Status:  auditRecordsOrg[p].Status == '' || auditRecordsOrg[p].Status == undefined || auditRecordsOrg[p].Status == null  ? 0 : auditRecordsOrg[p].Status,
@@ -1760,7 +1771,7 @@ class AuditForm extends Component {
         AuditCycleName: auditListOrg[i].AuditCycleName,
         AuditNumber: auditListOrg[i].AuditNumber,
         AuditPeriodId: auditListOrg[i].AuditPeriodId,
-        AuditProgramId:this.props.data.audits.smdata == 2 ? -2 : auditListOrg[i].AuditTemplateId,
+        AuditProgramId:this.props.data.audits.smdata == 2 ? -2 : this.state.AUDITPROG_ID,
         AuditProgramName: auditListOrg[i].AuditProgramName,
         // AuditStatus: auditListOrg[i].AuditStatus,
         AuditStatus: this.props.navigation.state.params.datapassParam.AuditStatus,
@@ -1843,7 +1854,7 @@ class AuditForm extends Component {
           AuditTypeOrder: auditRecordsOrg[p].AuditTypeOrder,
           AuditId: auditRecordsOrg[p].AuditId,
           AuditOrderId: auditRecordsOrg[p].AuditTypeOrder,
-          AuditProgramId: this.props.data.audits.smdata == 2 ? -2 : auditRecordsOrg[p].AuditTemplateId,
+          AuditProgramId: this.props.data.audits.smdata == 2 ? -2 : this.state.AUDITPROG_ID,
           AuditTypeId: auditRecordsOrg[p].AuditTypeId,
           SiteId: auditRecordsOrg[p].SiteId,
           Status: auditRecordsOrg[p].Status == '' || auditRecordsOrg[p].Status == undefined || auditRecordsOrg[p].Status == null? 0 : auditRecordsOrg[p].Status,
@@ -1894,7 +1905,7 @@ class AuditForm extends Component {
           AuditTypeOrder: auditRecordsOrg[p].AuditTypeOrder,
           AuditId: auditRecordsOrg[p].AuditId,
           AuditOrderId: auditRecordsOrg[p].AuditTypeOrder,
-          AuditProgramId: this.props.data.audits.smdata == 2 ? -2 : auditRecordsOrg[p].AuditTemplateId,
+          AuditProgramId: this.props.data.audits.smdata == 2 ? -2 : this.state.AUDITPROG_ID,
           AuditTypeId: auditRecordsOrg[p].AuditTypeId,
           SiteId: auditRecordsOrg[p].SiteId,
           Status: auditRecordsOrg[p].Status == '' || auditRecordsOrg[p].Status == undefined || auditRecordsOrg[p].Status == null? 0 : auditRecordsOrg[p].Status,
@@ -1979,7 +1990,7 @@ class AuditForm extends Component {
               AuditTypeOrder: auditRecordsOrg[p].AuditTypeOrder,
               AuditId: auditRecordsOrg[p].AuditId,
               AuditOrderId: auditRecordsOrg[p].AuditTypeOrder,
-              AuditProgramId: this.props.data.audits.smdata == 2 ? -2 : auditRecordsOrg[p].AuditTemplateId,
+              AuditProgramId: this.props.data.audits.smdata == 2 ? -2 : this.state.AUDITPROG_ID,
               AuditTypeId: auditRecordsOrg[p].AuditTypeId,
               SiteId: auditRecordsOrg[p].SiteId,
               Status: auditRecordsOrg[p].Status == '' || auditRecordsOrg[p].Status == undefined || auditRecordsOrg[p].Status == null ? 0 : auditRecordsOrg[p].Status,
@@ -2236,7 +2247,7 @@ class AuditForm extends Component {
               AuditTypeOrder: auditRecordsOrg[p].AuditTypeOrder,
               AuditId: auditRecordsOrg[p].AuditId,
               AuditOrderId: auditRecordsOrg[p].AuditTypeOrder,
-              AuditProgramId: this.props.data.audits.smdata == 2 ? -2 : auditRecordsOrg[p].AuditTemplateId,
+              AuditProgramId: this.props.data.audits.smdata == 2 ? -2 : this.state.AUDITPROG_ID,
               AuditTypeId: auditRecordsOrg[p].AuditTypeId,
               SiteId: auditRecordsOrg[p].SiteId,
              Status: auditRecordsOrg[p].Status == '' || auditRecordsOrg[p].Status == undefined || auditRecordsOrg[p].Status == null ? 0 : auditRecordsOrg[p].Status,
@@ -2352,7 +2363,7 @@ class AuditForm extends Component {
               AuditCycleName: auditListOrg[i].AuditCycleName,
               AuditNumber: auditListOrg[i].AuditNumber,
               AuditPeriodId: auditListOrg[i].AuditPeriodId,
-              AuditProgramId: this.props.data.audits.smdata == 2 ? -2 : auditListOrg[i].AuditTemplateId,
+              AuditProgramId: this.props.data.audits.smdata == 2 ? -2 : this.state.AUDITPROG_ID,
               AuditProgramName: auditListOrg[i].AuditProgramName,
               // AuditStatus: auditListOrg[i].AuditStatus,
               AuditStatus: this.props.navigation.state.params.datapassParam.AuditStatus,

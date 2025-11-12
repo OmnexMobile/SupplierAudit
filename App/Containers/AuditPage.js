@@ -150,7 +150,7 @@ class AuditPage extends Component {
   }
   componentWillMount() {
     console.log('cStatusfff', this.props.navigation.state.params.datapass);
-
+this.getParamsDetails();
     NetInfo.fetch().then(isConnected => {
       if (isConnected.isConnected) {
         if (this.props.navigation.state.params.datapass) {
@@ -1528,14 +1528,15 @@ console.log('checkk838838383',this.props.data.audits);
   }
  
   async getParamsDetails() {
-    console.log('this.props.navigation.state.params.datapass.SiteId)',this.props.navigation.state.params.datapass.SiteId);
-    
-    AsyncStorage.setItem('AUDIT_ID',this.props.navigation.state.params.datapass.ActualAuditId);
-    AsyncStorage.setItem('AUDITPROG_ID',this.props.navigation.state.params.datapass.AuditProgramId);
-    AsyncStorage.setItem('AUDITYPE_ORDER',this.props.navigation.state.params.datapass.ActualAuditOrderNo);
-    AsyncStorage.setItem('AUDITYPE_ID',this.props.navigation.state.params.datapass.AuditTypeId);
+    console.log('this.props.navigation.state.params.datapass.SiteId)',this.props.navigation.state.params.datapass);
+    AsyncStorage.setItem('AUDIT_ID', String(this.props.navigation.state.params.datapass.ActualAuditId));
+
+    AsyncStorage.setItem('AUDIT_ID',`${this.props.navigation.state.params.datapass.ActualAuditId}`);
+    AsyncStorage.setItem('AUDITPROG_ID',`${this.props.navigation.state.params.datapass.AuditProgramId}`);
+    AsyncStorage.setItem('AUDITYPE_ORDER',`${this.props.navigation.state.params.datapass.ActualAuditOrderNo}`);
+    AsyncStorage.setItem('AUDITYPE_ID',`${this.props.navigation.state.params.datapass.SitAuditTypeIdeId}`);
     AsyncStorage.setItem('SITEID',`${this.props.navigation.state.params.datapass.SiteId}`);
-    AsyncStorage.setItem('AUDITPROGORDER',this.props.navigation.state.params.datapass.AuditProgramId);
+    AsyncStorage.setItem('AUDITPROGORDER',`${this.props.navigation.state.params.datapass.AuditProgramOrder}`);
     // AsyncStorage.setItem('AUDIT_SITE_ID',this.state.AUDIT_SITE_ID);
     // AsyncStorage.setItem('AUDIT_STATUS',this.props.navigation.state.params.datapass.AuditStatus);
 }
@@ -2320,6 +2321,7 @@ console.log('checkk838838383',this.props.data.audits);
           FailureReasonId:CheckpointsDetails[i].FailureReasonId,
           FormId: CheckpointsDetails[i].FormId,
           immediateAction: CheckpointsDetails[i].immediateAction,
+          ncOFIStatus: CheckpointsDetails[i].ByteAttachment1,
         });
       }
     }

@@ -1,6 +1,7 @@
 import { StyleSheet, Dimensions} from 'react-native'
 import { width, height } from 'react-native-dimension'
 import Fonts from '../../Themes/Fonts'
+import { android15HeaderPadding, android15FooterPadding, android15FooterOffset } from '../../Themes/AndroidInsets'
 
 let Window = Dimensions.get('window')
 
@@ -11,11 +12,12 @@ export default StyleSheet.create({
     justifyContent: 'flex-start',
   },
   header: {
-    width:'100%',
-   // zIndex: 3000,
+    width:"100%",
+    zIndex: 3000,
     flexDirection: 'row',
     //backgroundColor: 'white',
     padding: 5,
+    paddingTop: 5 + android15HeaderPadding,
     alignItems: 'center',
     justifyContent: 'center',
     height: 60,
@@ -29,18 +31,17 @@ export default StyleSheet.create({
   backlogo:{
     flexDirection: 'row',
     backgroundColor:'transparent',
-    width: width(10),
+    width: width(15),
     height: 65,
     justifyContent: 'center', 
     alignItems:'center'
   },
   heading:{
     flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignContent:'center', 
-   // alignItems:'center', 
+    justifyContent: 'center', 
+    alignItems:'center', 
     width: '70%',
-    height: 45
+    height: 65
   },  
   headingText:{
     fontSize: Fonts.size.h6,
@@ -64,7 +65,8 @@ export default StyleSheet.create({
     width:'100%',
     backgroundColor:'transparent',
     height: 65,
-    zIndex: 3000
+    zIndex: 3000,
+    paddingBottom: android15FooterPadding
   },  
   footerDiv:{
     flexDirection:'row',
@@ -72,7 +74,8 @@ export default StyleSheet.create({
     alignItems: 'center',
     width:width(100),
     height:65,
-    position:'absolute'
+    position:'absolute',
+    bottom: android15FooterOffset
   },
   auditPageBody: {
   flex: 1,
@@ -91,8 +94,8 @@ export default StyleSheet.create({
     backgroundColor: 'transparent' 
   },
   card1:{
-    width:'95%',
-    height:'95%',
+    width:'100%',
+    height:'100%',
     backgroundColor:'white',
     flexDirection:'column',
     borderWidth:0.5,
@@ -103,12 +106,12 @@ export default StyleSheet.create({
     alignItems:'center'
   },
   card:{
-    width:Window.width,
-    height:290,
-    backgroundColor:'white',
-    marginTop:10,
-    justifyContent:'center',
-    alignItems:'center',
+    // width:Window.width,
+    // height:290,
+    // marginTop:10,
+    // justifyContent:'center',
+    // alignItems:'center',
+    flex:1,margin:25,borderRadius:8
   },
   cardT:{
   backgroundColor:'white',

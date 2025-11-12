@@ -41,6 +41,7 @@ import DeviceInfo from 'react-native-device-info';
 import RNFetchBlob from 'react-native-fetch-blob';
 import CryptoJS from 'crypto-js';
 import FileViewer from 'react-native-file-viewer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 var RNFS = require('react-native-fs');
 
@@ -1650,7 +1651,7 @@ class NCOFIPage extends Component {
     });
   };
 
-  refreshList = () => {
+  refreshList = async () => {
     var AuditID = this.state.AUDIT_ID;
     var Data = this.props.data.audits.auditRecords;
     console.log('checkdatanc-----',Data);
@@ -1663,6 +1664,8 @@ class NCOFIPage extends Component {
 
     var SiteID = this.props.data.audits.siteId;
     var TOKEN = this.props.data.audits.token;
+   let progID =  await AsyncStorage.getItem('AUDITPROG_ID');
+console.log('checkDetailsss--------',progID);
 
     for (var i = 0; i < Data.length; i++) {
       if (this.state.AUDIT_ID == Data[i].AuditId) {
@@ -1671,7 +1674,7 @@ class NCOFIPage extends Component {
           iAudProgId = -2;
         }else{
         console.log('innsideelseprogid',Data[i].AuditTemplateId);
-        iAudProgId = 7
+        iAudProgId = progID;
         }
         AuditTypeId = Data[i].AuditTypeId;
       }

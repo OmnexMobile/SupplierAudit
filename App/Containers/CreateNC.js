@@ -3694,16 +3694,19 @@ class CreateNC extends Component {
                       ) : null}
                     </View>
                   </View>
-                  <View style={styles.div01}>
+                  
+{/* <View style={{flexDirection:'row', width: '100%', height:40,flex:1,marginTop: -20}}>
+  <View style={{width:'90%',alignItems:'center',justifyContent:'center',}}>
+
                     <View
                       style={[
                         styles.input002,
-                        this.state.underline2 == true
-                          ? {borderBottomColor: 'red', borderBottomWidth: 0.5}
-                          : {
-                              borderBottomColor: 'lightgrey',
-                              borderBottomWidth: 0.7,
-                            },
+                        // this.state.underline2 == true
+                        //   ? {borderBottomColor: 'red', borderBottomWidth: 0.5}
+                        //   : {
+                        //       borderBottomColor: 'lightgrey',
+                        //       borderBottomWidth: 0.7,
+                        //     },
                       ]}
                       onPress={() => this.setState({isVisible: true})}>
                       {this.state.displayData ? (
@@ -3712,7 +3715,7 @@ class CreateNC extends Component {
                             padding: 0,
                             margin: 0,
                             color: '#A6A6A6',
-                            width: '90%',
+                            width: '80%',
                             fontSize: Fonts.size.regular,
                             fontFamily: 'OpenSans-Regular',
                           }}>
@@ -3721,51 +3724,33 @@ class CreateNC extends Component {
                       ) : null}
                       <View style={{flexDirection: 'row'}}>
                         <TextInput
-                          style={
-                            this.state.displayData
-                              ? styles.placeholderSRLabel
-                              : styles.placeholderSR
-                          }
+                         style={{
+                            padding: 0,
+                            margin: 0,
+                            color: '#A6A6A6',
+                            width: '80%',
+                            fontSize: Fonts.size.regular,
+                            fontFamily: 'OpenSans-Regular',
+                          }}
                           multiline={true}
-                          // placeholder={strings.StandardRequirementsL}
+                          placeholder={strings.StandardRequirementsL}
                           placeholderTextColor={
                             this.state.underline2 == true ? 'red' : '#A6A6A6'
                           }
                           textColor="#747474"
-                          // numberOfLines={1}
-                          // underlineColorAndroid={this.state.MarkClause === true ? 'red' : '#747474'}
+                          numberOfLines={1}
                           value={
                             this.state.displayData
                               ? this.state.displayData.length > 40
-                                ? this.state.displayData.substring(0, 40) +
+                                ? this.state.displayData.substring(0, 20) +
                                   '...'
                                 : this.state.displayData
                               : ''
                           }
-                          // value={this.state.displayData}
                           editable={false}
                           onFocus={() => this.setState({isVisible: true})}
                         />
-                        {this.state.displayData != '' &&
-                        this.state.displayData != undefined ? (
-                          <TouchableOpacity
-                            style={{
-                              right: 0,
-                              left: 11,
-                              top: 5,
-                              backgroundColor: 'white',
-                              width: 30,
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}
-                            onPress={() =>
-                              this.setState({NCtxtFlag: false, isVisible: true})
-                            }>
-                            <Icon name="eye" size={20} color="black" />
-                          </TouchableOpacity>
-                        ) : (
-                          <View></View>
-                        )}
+                       
                       </View>
                     </View>
                     <View
@@ -3774,9 +3759,112 @@ class CreateNC extends Component {
                           ? {display: 'none'}
                           : styles.check
                       }>
-                      {/* <Icon style={{ left: 10 }} name="asterisk" size={8} color="red" /> */}
+                    </View>
+                  
+  </View>
+  <View style={{width:'20%',}}>
+     <TouchableOpacity  onPress={() =>
+                              this.setState({NCtxtFlag: false, isVisible: true})
+                            }>
+                  <Icon name={"eye"} size={20} style={{marginRight:35}}/>
+
+                  </TouchableOpacity>
+                  
+  </View>
+</View> */}
+ <View style={{flexDirection:'row',justifyContent:'space-between',alignContent:'space-between'}}>
+                  <Text>{""}</Text>
+                  <TouchableOpacity  onPress={() =>
+                              this.setState({NCtxtFlag: false, isVisible: true})
+                            }>
+                  <Icon name={"eye"} size={20} style={{marginRight:35}}/>
+
+                  </TouchableOpacity>
+                  
+                  
+                  </View>
+                  
+
+
+                  <View style={styles.div01}>
+                    <View
+                      style={[
+                        styles.input002,
+                        // this.state.underline2 == true
+                        //   ? {borderBottomColor: 'red', borderBottomWidth: 0.5}
+                        //   : {
+                        //       borderBottomColor: 'lightgrey',
+                        //       borderBottomWidth: 0.7,
+                        //     },
+                      ]}
+                      onPress={() => this.setState({isVisible: true})}>
+                      {this.state.displayData ? (
+                        <Text
+                          style={{
+                            padding: 0,
+                            margin: 0,
+                            color: '#A6A6A6',
+                            width: '80%',
+                            fontSize: Fonts.size.regular,
+                            fontFamily: 'OpenSans-Regular',
+                          }}>
+                          {strings.StandardRequirementsL}
+                        </Text>
+                      ) : null}
+                      <View style={{flexDirection: 'row'}}>
+                        <TextInput
+                        
+                          multiline={true}
+                          placeholder={strings.StandardRequirementsL}
+                          placeholderTextColor={
+                            this.state.underline2 == true ? 'red' : '#A6A6A6'
+                          }
+                          textColor="#747474"
+                          numberOfLines={1}
+                          value={
+                            this.state.displayData
+                              ? this.state.displayData.length > 40
+                                ? this.state.displayData.substring(0, 40) +
+                                  '...'
+                                : this.state.displayData
+                              : ''
+                          }
+                          editable={false}
+                          onFocus={() => this.setState({isVisible: true})}
+                        />
+                        {/* {this.state.displayData != '' &&
+                        this.state.displayData != undefined ? (
+                          <TouchableOpacity
+                            style={{
+                              right: 0,
+                              left: 11,
+bottom:10,                              backgroundColor: 'white',
+                              width: "7%",
+                              justifyContent:'flex-end',
+                              alignItems:'flex-end',
+                            }}
+                            onPress={() =>
+                              this.setState({NCtxtFlag: false, isVisible: true})
+                            }>
+                            <Icon name="eye" size={20} color="black" />
+                          </TouchableOpacity>
+                        ) : (
+                          <View></View>
+                        )} */}
+                      </View>
+                    </View>
+                    <View
+                      style={
+                        this.state.RouteParam == 'OFI' || this.state.isLPA
+                          ? {display: 'none'}
+                          : styles.check
+                      }>
                     </View>
                   </View>
+<View style={{backgroundColor:'lightgray',height:'.1%',width:'95%',alignItems:'center',justifyContent:'center',alignSelf:'center',marginTop:'5%'}}></View>
+
+                 
+                 
                   <View style={styles.div1}>
                     <View style={styles.input03}>
                       {this.state.isContainValue1 === true ? (

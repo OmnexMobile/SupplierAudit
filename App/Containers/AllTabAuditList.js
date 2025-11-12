@@ -723,6 +723,8 @@ todayAudits() {
                 var auditListProps = this.props.data.audits.auditRecords;
                 let keyVal = 0
                 _.forEach(auditList, function (Audit_res) {
+                  console.log('Audit_resAudit_resAudit_res',Audit_res);
+                  
                   var auditInfo = Audit_res;
                   auditInfo['color'] = '#1081de';
                   auditInfo['cStatus'] = constant.StatusScheduled;
@@ -830,6 +832,8 @@ todayAudits() {
                  * Finally we have a structure like
                  * { 2020-02-10: [{},{}], 2020-01-28: [{}] }
                  */
+                console.log('checkthevaluesagendaObj',agendaObj);
+                
                 this.setState({agendaData: agendaObj, todayLoader: false});
                 // this.transformAuditForAgenda(auditList)
               } else {

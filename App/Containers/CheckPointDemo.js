@@ -66,7 +66,11 @@ import { RichEditor} from 'react-native-pell-rich-editor';
 const Width = Dimensions.get('window').width;
 const Colors = {
   0: 'red',
+  1:  'red',
+  2: '#F1FF58',
+  3:  '#00FF0D',
   4: 'red',
+  5:  '#EFFF43',
   6: 'yellow',
   8: 'yellow',
   10: 'green',
@@ -180,7 +184,8 @@ class CheckPointDemo extends Component {
       selectedItem: '',
       failureloaded: false,
       radiovalueloaded: false,
-      ReportId:''
+      ReportId:'',
+      webtoMobSync: false
     };
   }
 
@@ -303,6 +308,7 @@ class CheckPointDemo extends Component {
         // getting the particular checkpoint related to the checklist
 
         var RelatedCheckpoints = [];
+console.log('checkingvalue---------321auditRecords',auditRecords);
 
         for (var i = 0; i < auditRecords.length; i++) {
           if (auditRecords?.[i]?.AuditId == this.state.auditId) {
@@ -3051,6 +3057,7 @@ updatecheckpointvalues_new = () => {
                     }
                   }
                 }
+              console.log('listDataArr00000000000',listDataArr)
                 var AuditRecordStatus = auditRecordsOrg[p].AuditRecordStatus;
 
                 if (auditRecordsOrg[p].AuditId == this.state.auditId) {
@@ -3205,7 +3212,7 @@ updatecheckpointvalues_new = () => {
                         item.ParentId.toString() === ChecklistTemplateId &&
                         item.Score === '-2',
                     );
-                    //console.log('Empty Count', emptycount);
+                    console.log('Empty Count', emptycount);
                     checklistpropdata.push({
                       ...chckpropdata,
                       MandatoryCount: emptycount.length,
@@ -3413,6 +3420,8 @@ updatecheckpointvalues_new = () => {
                 },
                 () => {
                   // this.refs.toast.show(strings.CheckpointSave, 5000);
+                  console.log('check----------checkPointsValues',this.state.checkPointsValues);
+                  
                   if (this.state.go_home) {
                     this.props.navigation.navigate('AuditDashboard');
                     this.getTotalNCStatus();
@@ -3471,21 +3480,7 @@ updatecheckpointvalues_new = () => {
       'checkPointDetailpopup' ,
         checkPointDetail,
     );
-    console.log(
-      'checklistpopup' ,
-      checklist
-    );
-    
-    if (checkPointDetail.Score == '0'){
-      checkPointDetail.show_nc_ofi_status = 1
-    }
-    if (checkPointDetail.Score == '1'){
-      checkPointDetail.show_nc_ofi_status = 3
-    }
-    console.log(
-      'checkPointDetailpopup2222' ,
-        checkPointDetail,
-    );
+
     this.setState(
       {
         dialogVisibleNC: true,
@@ -5000,6 +4995,10 @@ this.setState({selectedindex: checkpoint});
     }
     this.setState({checkPointsDetails: newCheckPointDetails}, () => {
       //console.log('Attachment:Downloded', this.state.checkPointsDetails);
+      console.log('newCheckPointDetails-------232',newCheckPointDetails);
+      console.log('checkPointsDetails-------232',this.state.checkPointsDetails);
+
+      
     });
   }
 
@@ -7521,12 +7520,14 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                       height: 40,
                                     }}>
                                     <TouchableOpacity
-                                      onPress={
-                                        this.popupModal.bind(
-                                          this,
-                                          this.state.checkPointsDetails[index],
-                                          this.state.checkPointList[index]
-                                      )}
+                                     onPress={() => {
+                                            this.popupModal(
+                                              this.state.checkPointsDetails[index],
+                                                  this.state.checkPointList[index]);
+                                               this.setState({
+                                               Status_nc_ofi: this.state.checkPointsDetails[index].ncOFIStatus
+                                              });
+                                          }}
                                       style={styles.ncofi}>
                                       <Text
                                         style={{
@@ -8016,9 +8017,9 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                                         );
 
                                                         console.log(
-                                                          'ColorVerification',
+                                                          'ColorVerification NC/OFI Checck-----1',
                                                           item.scoreTypesData[j]
-                                                            .color,
+                                                            .status,
                                                         );
                                                         this.setState({
                                                           Status_nc_ofi:
@@ -8289,7 +8290,7 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                                               .show_nc_ofi_status,
                                                         );
                                                         console.log(
-                                                          'status in score type data: ' +
+                                                          'status in score type data: NC/OFI Checck-----2' +
                                                             item.scoreTypesData[
                                                               j
                                                             ].status,

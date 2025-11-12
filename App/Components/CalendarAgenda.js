@@ -49,6 +49,8 @@ class CalendarAgenda extends Component {
       startDate: undefined,
       endDate: undefined,
     };
+    console.log('checkagendaDataagendaData',this.state.agendaData);
+    
   }
   changeDateFormatCard = (inDate) => {
     if (inDate) {

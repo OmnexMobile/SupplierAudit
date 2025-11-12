@@ -1959,7 +1959,7 @@ class AuditDashboardFooter extends Component {
             </Text>
           </TouchableOpacity>
 
-          <View style={styles.footerMenuItem}>
+          {/* <View style={styles.footerMenuItem}>
             {!this.state.isSyncing ? (
               <View
                 style={{textAlign: 'center', alignItems: 'center'}}
@@ -1974,7 +1974,7 @@ class AuditDashboardFooter extends Component {
                   source={Images.syncImg}
                   initWidth="40" initHeight="40"
                 /> */}
-                <Icon name="upload" size={20} color="lightgrey" />
+                {/* <Icon name="upload" size={20} color="lightgrey" />
                 <Text
                   style={{
                     color: 'lightgrey',
@@ -1994,7 +1994,7 @@ class AuditDashboardFooter extends Component {
               <ActivityIndicator size={20} color="#1CAFF6" />
               </View>
             )}
-          </View>
+          </View>  */}
           <TouchableOpacity
             onPress={() =>
               // this.props.navigation.navigate('UserPreference')
