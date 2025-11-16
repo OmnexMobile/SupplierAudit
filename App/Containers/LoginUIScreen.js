@@ -76,7 +76,8 @@ class LoginUIScreen extends Component {
       userFullName: '',
       isActiveDirectory: false,
       isAdvalue: true,
-      loginFlag: parseInt('')
+      loginFlag: parseInt(''),
+      appVersion : ''
     };
   }
 
@@ -93,7 +94,8 @@ class LoginUIScreen extends Component {
     console.log('cleanURL', this.propsServerUrl);
      AsyncStorage.setItem('ssoenableflag',this.state.ssoEnabled);
 
-  
+  const version = DeviceInfo.getVersion();
+    this.setState({ appVersion: version });
 
     this.getToken();
     if (this.props.data.audits.language === 'Chinese') {
@@ -1322,6 +1324,7 @@ console.log( LoggedUserDetails[0].audits.siteId,"siteidinlogin");
       <KeyboardAvoidingView style={{flex: 1}}>
         <OfflineNotice />
         {/*settings and language space*/}
+       
         <ImageBackground
           source={Images.LoginBack2}
           style={styles.backgroundImage}>
@@ -1444,7 +1447,11 @@ console.log( LoggedUserDetails[0].audits.siteId,"siteidinlogin");
               </View>
             </TouchableOpacity>
           </View>
+         
         </ImageBackground>
+         <View style={styles.versionContainer}>
+          <Text style={styles.versionText}>v{this.state.appVersion}</Text>
+        </View>
       </KeyboardAvoidingView>
       // <KeyboardAvoidingView>
       //   <View style={styles.mainContainer}>

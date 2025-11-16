@@ -2238,7 +2238,7 @@ console.log('checkk838838383',this.props.data.audits);
     console.log('download:Formdata', Formdata);
     console.log('CheckListPropData', CheckListPropData);
     console.log('CheckpointLogic', CheckpointLogic);
-    console.log('CheckpointsDetails', CheckpointsDetails);
+    console.log('CheckpointsDetails----Auditpage', CheckpointsDetails);
     console.log('DropDownProps', DropDownProps);
     console.log(
       'Attachment:download:checkPointAttachment:',

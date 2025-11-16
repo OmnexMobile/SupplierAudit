@@ -185,7 +185,7 @@ class CheckPointDemo extends Component {
       failureloaded: false,
       radiovalueloaded: false,
       ReportId:'',
-      webtoMobSync: false
+      Status_nc_ofi_bool: false
     };
   }
 
@@ -376,12 +376,10 @@ console.log('checkingvalue---------321auditRecords',auditRecords);
         var data = AuditCheckpointDetail;
         var checkPointList = [];
         var checkPointsDetails = [];
-        // console.log(
-        //   'Response data',
-        //   data,
-        //   AuditCheckpointDetail,
-        //   CheckpointAttachment,
-        // );
+        console.log(
+          'Response data',
+          data,
+        );
         let temp = this.props.data.audits.auditRecords.findIndex(
           obj => obj.AuditId === this.state.auditId,
         );
@@ -486,6 +484,7 @@ console.log('checkingvalue---------321auditRecords',auditRecords);
                 FailureReasonId: data[i].FailureReasonId,
                 RadioValue: data[i].RadioValue,
                 Remark: data[i].Remark,
+                ncOFIStatus: data[i].ByteAttachment1
               });
             }
           }
@@ -615,7 +614,7 @@ console.log('checkingvalue---------321auditRecords',auditRecords);
                     //console.log('**ANSTYPE**', checkPointList?.[j]?.ansType);
                     if (checkPoints[i].RadioValue == 0) {
                       if (checkPointList?.[j]?.Status == 0) {
-                        //console.log('**checkpoints details**', checkPoints);
+                        console.log('**checkpoints details**', checkPoints);
                         console.log('checkdetailpush===>33', checkPointList);
                         temppp = '33';
 
@@ -2467,34 +2466,9 @@ console.log('checkingvalue---------321auditRecords',auditRecords);
             selectedindex: checkPointList[0],
           },
           () => {
-            // //console.log('this.stat e.checkPointsValues',this.state.checkPointsValues)
-            // //console.log('this.state.dropProps',this.state.dropProps)
-            // //console.log('this.state.raiseId',this.state.raiseID)
-            // //console.log('this.state.Radiologic',this.state.RadioLogic)
-            // //console.log('this.state.ischeckLPA',this.state.ischeckLPA)
-            // //console.log('--drop-->',this.state.dropdown)
-            // //console.log('checkpointList loaded',this.state.checkpointList)
-            // console.log(
-            //   'checkPointsDetails loaded',
-            //   temppp,
-            //   this.state.checkPointsDetails,
-            // );
-            // console.log(
-            //   'checkPointsDetails loadedischeckLPA',
-
-            //   this.state.ischeckLPA,
-            // );
-            // console.log(
-            //   'checkPointsDetails loadedLPAdrop',
-
-            //   this.state.LPAdrop,
-            // );
-            //console.log('checkPointsDetails dropdown', this.state.dropdown);
-
             console.log(
-              'Load: checkPointsDetails',
-              temppp,
-              this.state.checkpointList,
+              'checkPointsDetails------11111',
+              this.state.checkPointsDetails,
             );
           },
         );
@@ -2578,7 +2552,7 @@ console.log('checkingvalue---------321auditRecords',auditRecords);
             },
             () => {
               console.log(
-                'Checkpoint page - checkPointsDetails',
+                'checkPointsDetails------222222',
                 this.state.checkPointsDetails,
                 cameraCapture,
               );
@@ -2660,7 +2634,7 @@ console.log('checkingvalue---------321auditRecords',auditRecords);
           {checkPointsDetails: checkPointsDetails, isUnsavedData: true},
           () => {
             console.log(
-              'Checkpoint page - checkPointsDetails --nc/ofi',
+              'checkPointsDetails------3333',
               this.state.checkPointsDetails,
             );
             this.countStatistics(this.state.checkPointsDetails);
@@ -2790,7 +2764,7 @@ console.log('checkingvalue---------321auditRecords',auditRecords);
         isCaroselLoaded: true,
       },
       () => {
-        //console.log('total checkpoints filled', this.state.totalfilled);
+        console.log('checkPointsDetails------44444', this.state.checkPointsDetails);
         //console.log('total pending checkpoints', this.state.mandateCheckpoints);
         //console.log('total manadatory checkpoints', this.state.mandatoryCheck);
       },
@@ -2874,8 +2848,8 @@ updatecheckpointvalues_new = () => {
       var m = 0;
 
       var checkPointsDetails = this.state.checkPointsDetails;
-      console.log('checkcheckpoinntdetails***********',checkPointsDetails);
-      
+      console.log('checkcheckpoinntdetails***********before',checkPointsDetails);
+   
       //console.log(this.state.checkPointsDetails, 'hellodataone');
       this.setState({checkMandate: true});
       var arr = [];
@@ -3053,6 +3027,11 @@ updatecheckpointvalues_new = () => {
                             ? this.state.deleteallattachment
                             : auditRecordsOrg[p].Listdata[q]
                                 .deleteallattachment,
+
+                        ncOFIStatus:
+                          auditRecordsOrg[p].Listdata[q]?.ByteAttachment1,
+                        ncOFIStatus2:
+                          auditRecordsOrg[p].Listdata[q].ncOFIStatus,
                       });
                     }
                   }
@@ -3131,6 +3110,10 @@ updatecheckpointvalues_new = () => {
                         // FileContent:checkPointsDetails[j].FileContent
                         deleteallattachment:
                           listDataArr[i]?.deleteallattachment,
+                        ncOFIStatus: listDataArr[i]?.ByteAttachment1,
+                        ncOFIStatus2: listDataArr[i]?.ncOFIStatus,
+                        
+
                       };
                     }
                   }
@@ -3480,16 +3463,21 @@ updatecheckpointvalues_new = () => {
       'checkPointDetailpopup' ,
         checkPointDetail,
     );
-
+    console.log('Status_nc_ofi_bool' ,this.state.Status_nc_ofi_bool);
+    const resolvedNcOfiStatus = this.resolveCheckpointNcOfiStatus(
+      checkPointDetail,
+    );
+    checkPointDetail.show_nc_ofi_status = resolvedNcOfiStatus;
     this.setState(
       {
         dialogVisibleNC: true,
         isNCAllowed: checkPointDetail.IsNCAllowed,
         ncofiPassAuditId: checkPointDetail.AuditId,
         ncofiPassTemplateId: checkPointDetail.ChecklistTemplateId,
-        Status_nc_ofi: checkPointDetail.show_nc_ofi_status,
+        Status_nc_ofi: resolvedNcOfiStatus,
         radiovalue_ncofi: checkPointDetail.RadioValue,
         current_nc_ofi_count: this.props.data.audits,
+        Status_nc_ofi_bool: false
         // checklistName: this.state.checklistName,
       },
       () => {
@@ -3497,10 +3485,193 @@ updatecheckpointvalues_new = () => {
         // //console.log('IsNCAllowed',this.state.isNCAllowed)
         //console.log('checking Details::::----', this.state.radiovalue_ncofi);
         console.log(
-          'checking Details::::----Status_nc_ofi',
-          this.state.Status_nc_ofi,
+          'nc/ofi2323232323',
+          this.state.Status_nc_ofi_bool,
         );
       },
+    );
+  }
+
+  normalizeNcOfiStatus(statusValue) {
+    const parsedStatus = parseInt(statusValue, 10);
+    return Number.isNaN(parsedStatus) ? 0 : parsedStatus;
+  }
+
+  getNcOfiStatusValue(checkPointDetail) {
+    if (!checkPointDetail) {
+      return 0;
+    }
+    const candidates = [
+      checkPointDetail.show_nc_ofi_status,
+      checkPointDetail.ncOFIStatus,
+      checkPointDetail.ncOFIStatus2,
+    ];
+    const statusCandidate = candidates.find(
+      value => value !== undefined && value !== null && value !== '',
+    );
+    return this.normalizeNcOfiStatus(statusCandidate);
+  }
+
+  hasAnyNcOfiAction(checkPointDetail) {
+    if (!checkPointDetail) {
+      return false;
+    }
+    const rawScoreText = checkPointDetail?.Scoretext;
+    if (rawScoreText !== undefined && rawScoreText !== null) {
+      const normalizedScoreText = `${rawScoreText}`.trim().toLowerCase();
+      if (
+        normalizedScoreText === '3' ||
+        normalizedScoreText === 'compliance' || 
+        normalizedScoreText === '10' 
+
+      ) {
+        return false;
+      }
+    }
+    const status = this.resolveCheckpointNcOfiStatus(checkPointDetail);
+    return status === 1 || status === 2 || status === 3;
+  }
+ 
+  canShowNcOption(statusValue) {
+    const status = this.normalizeNcOfiStatus(statusValue);
+    return status === 1 || status === 2;
+  }
+
+  canShowOfiOption(statusValue) {
+    const status = this.normalizeNcOfiStatus(statusValue);
+    return status === 2 || status === 3;
+  }
+
+  getCheckpointMeta(checkPointDetail) {
+    const {checkpointList = []} = this.state;
+    if (!checkPointDetail || !checkpointList?.length) {
+      return null;
+    }
+    return checkpointList.find(meta => {
+      if (!meta) {
+        return false;
+      }
+      if (
+        checkPointDetail.ChecklistTemplateId &&
+        meta.ChecklistTemplateId &&
+        `${meta.ChecklistTemplateId}` ===
+          `${checkPointDetail.ChecklistTemplateId}`
+      ) {
+        return true;
+      }
+      if (
+        checkPointDetail.SerialNo &&
+        meta.SerialNo &&
+        `${meta.SerialNo}` === `${checkPointDetail.SerialNo}`
+      ) {
+        return true;
+      }
+      return (
+        checkPointDetail.FormId &&
+        meta.FormID &&
+        `${meta.FormID}` === `${checkPointDetail.FormId}`
+      );
+    });
+  }
+
+  deriveNcOfiStatusFromMeta(checkPointDetail, checkpointMeta) {
+    if (
+      !checkPointDetail ||
+      !checkpointMeta ||
+      !checkpointMeta.scoreTypesData ||
+      !checkpointMeta.scoreTypesData.length
+    ) {
+      return 0;
+    }
+
+    const rawValues = [
+      checkPointDetail.Scoretext,
+      checkPointDetail.Score,
+      checkPointDetail.RadioValue,
+    ];
+    const selectedValues = rawValues
+      .map(value =>
+        value !== undefined && value !== null ? `${value}`.trim() : '',
+      )
+      .filter(
+        value =>
+          value &&
+          value.toLowerCase() !== 'please select'.toLowerCase() &&
+          value.toLowerCase() !== 'n/a'.toLowerCase(),
+      );
+
+    if (!selectedValues.length) {
+      return 0;
+    }
+
+    const matchedScoreType = checkpointMeta.scoreTypesData.find(option => {
+      const optionValue =
+        option?.value !== undefined && option?.value !== null
+          ? `${option.value}`.trim()
+          : '';
+      const optionId =
+        option?.id !== undefined && option?.id !== null
+          ? `${option.id}`.trim()
+          : '';
+      const optionScore =
+        option?.score !== undefined && option?.score !== null
+          ? `${option.score}`.trim()
+          : '';
+      const optionScoreText =
+        option?.Scoretext !== undefined && option?.Scoretext !== null
+          ? `${option.Scoretext}`.trim()
+          : '';
+      return (
+        (optionValue && selectedValues.includes(optionValue)) ||
+        (optionId && selectedValues.includes(optionId)) ||
+        (optionScore && selectedValues.includes(optionScore)) ||
+        (optionScoreText && selectedValues.includes(optionScoreText))
+      );
+    });
+
+    if (!matchedScoreType) {
+      return 0;
+    }
+
+    return this.normalizeNcOfiStatus(matchedScoreType.status);
+  }
+
+  resolveCheckpointNcOfiStatus(checkPointDetail) {
+    const existingStatus = this.getNcOfiStatusValue(checkPointDetail);
+    if (existingStatus !== 0) {
+      return existingStatus;
+    }
+    const derivedStatus = this.deriveNcOfiStatusFromMeta(
+      checkPointDetail,
+      this.getCheckpointMeta(checkPointDetail),
+    );
+    if (derivedStatus !== 0) {
+      checkPointDetail.show_nc_ofi_status = derivedStatus;
+    }
+    return derivedStatus;
+  }
+
+  getNcOfiStatusLabel(statusValue) {
+    const status = this.normalizeNcOfiStatus(statusValue);
+    switch (status) {
+      case 1:
+        return strings.NC_OFI;
+      case 2:
+        return strings.NC_OFI ;
+      case 3:
+        return strings.NC_OFI;
+      case 4:
+        return 'No NC';
+      case 5:
+        return strings.NA || 'NA';
+      default:
+        return strings.NC_OFI ;
+    }
+  }
+
+  getCheckpointNcOfiLabel(checkPointDetail) {
+    return this.getNcOfiStatusLabel(
+      checkPointDetail ? checkPointDetail.show_nc_ofi_status : undefined,
     );
   }
 
@@ -3612,7 +3783,7 @@ updatecheckpointvalues_new = () => {
                 },
                 () => {
                   console.log(
-                    'one:Attachment: delete attachment checkpoint--->',
+                    'checkPointsDetails-----55555',
                     this.state.checkPointsDetails,
                   );
                   this.refs.toast.show('Attachment deleted successfully.', 100);
@@ -4142,7 +4313,7 @@ updatecheckpointvalues_new = () => {
             sumFileSizearray: sumArray,
           },
           () => {
-            //console.log(this.state.sumFileSizearray, 'sumFileSizearray');
+            console.log(this.state.checkPointsDetails, 'checkPointsDetails-----66666');
             this.sumFileSize();
           },
         );
@@ -4324,6 +4495,8 @@ updatecheckpointvalues_new = () => {
               isAttachmentLoaded: true,
             },
             () => {
+              console.log('checkPointsDetails-----77777',this.state.checkPointsDetails);
+              
               alert('File already Exist, Kindly add a different file');
             },
           );
@@ -4344,6 +4517,8 @@ updatecheckpointvalues_new = () => {
                     isAttachmentLoaded: true,
                   },
                   () => {
+                    console.log('checkPointsDetails------88888',this.state.checkPointsDetails);
+                    
                     return;
                   },
                 );
@@ -4996,7 +5171,7 @@ this.setState({selectedindex: checkpoint});
     this.setState({checkPointsDetails: newCheckPointDetails}, () => {
       //console.log('Attachment:Downloded', this.state.checkPointsDetails);
       console.log('newCheckPointDetails-------232',newCheckPointDetails);
-      console.log('checkPointsDetails-------232',this.state.checkPointsDetails);
+      console.log('checkPointsDetails-------999999',this.state.checkPointsDetails);
 
       
     });
@@ -5532,9 +5707,13 @@ isFailureReasonValid(failureReasonId, categoryId) {
 
   render() {
     //console.log(this.state.radiovalue_ncofi,"valuesincoming");
+console.log('checkkkkkkkkkksiuhdf ishd',this.state.checkPointsDetails);
 
     console.log("Load:Category:1:render")
     const {booleanNcofi} = this.state;
+    const currentNcOfiStatus = this.normalizeNcOfiStatus(
+      this.state.Status_nc_ofi,
+    );
     let data = [
       {
         value: 'X',
@@ -6377,7 +6556,9 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                             color: 'white',
                                             fontFamily: 'OpenSans-Regular',
                                           }}>
-                                          NC/OFI
+                                          {this.getCheckpointNcOfiLabel(
+                                            this.state.checkPointsDetails[index],
+                                          )}
                                         </Text>
                                       </TouchableOpacity>
                                     ) : null} 
@@ -6703,13 +6884,15 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                             ],
                                           )}
                                           style={styles.ncofi}>
-                                          <Text
-                                            style={{
-                                              color: 'white',
-                                              fontFamily: 'OpenSans-Regular',
-                                            }}>
-                                            NC/OFI
-                                          </Text>
+                                        <Text
+                                          style={{
+                                            color: 'white',
+                                            fontFamily: 'OpenSans-Regular',
+                                          }}>
+                                          {this.getCheckpointNcOfiLabel(
+                                            this.state.checkPointsDetails[index],
+                                          )}
+                                        </Text>
                                         </TouchableOpacity>
                                       )}
                                     {this.state.checkPointsDetails[index]
@@ -6729,8 +6912,10 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                             color: 'white',
                                             fontFamily: 'OpenSans-Regular',
                                           }}>
-                                        NC/OFI
-                                      </Text>
+                                          {this.getCheckpointNcOfiLabel(
+                                            this.state.checkPointsDetails[index],
+                                          )}
+                                        </Text>
                                       </TouchableOpacity>
                                     ) : null}
                                   </View>
@@ -7076,7 +7261,11 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                               color: 'white',
                                               fontFamily: 'OpenSans-Regular',
                                             }}>
-                                            NC/OFI
+                                            {this.getCheckpointNcOfiLabel(
+                                              this.state.checkPointsDetails[
+                                                index
+                                              ],
+                                            )}
                                           </Text>
                                         </TouchableOpacity>
                                       )}
@@ -7097,7 +7286,9 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                             color: 'white',
                                             fontFamily: 'OpenSans-Regular',
                                           }}>
-                                          NC/OFI
+                                          {this.getCheckpointNcOfiLabel(
+                                            this.state.checkPointsDetails[index],
+                                          )}
                                         </Text>
                                       </TouchableOpacity>
                                     ) : null}
@@ -7438,13 +7629,17 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                             ],
                                           )}
                                           style={styles.ncofi}>
-                                          <Text
-                                            style={{
-                                              color: 'white',
-                                              fontFamily: 'OpenSans-Regular',
-                                            }}>
-                                            NC/OFI
-                                          </Text>
+                                        <Text
+                                          style={{
+                                            color: 'white',
+                                            fontFamily: 'OpenSans-Regular',
+                                          }}>
+                                          {this.getCheckpointNcOfiLabel(
+                                            this.state.checkPointsDetails[
+                                              index
+                                            ],
+                                          )}
+                                        </Text>
                                         </TouchableOpacity>
                                       )}
                                     {this.state.checkPointsDetails[index]
@@ -7465,7 +7660,9 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                             color: 'white',
                                             fontFamily: 'OpenSans-Regular',
                                           }}>
-                                          NC/OFI
+                                          {this.getCheckpointNcOfiLabel(
+                                            this.state.checkPointsDetails[index],
+                                          )}
                                         </Text>
                                       </TouchableOpacity>
                                     ) : null}
@@ -7494,7 +7691,7 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                   ) : null}
                                 </View> */}
                                 
-  {this.state.checkPointsDetails[index].Score == -1 || this.state.checkPointsDetails[index].Score == 2 || this.state.checkPointsDetails[index].Score == 'N/A' || this.state.checkPointsDetails[index].Score == -2 || this.state.checkPointsDetails[index].ncOFIStatus == 4 ? null:<>{
+  {/* {this.state.checkPointsDetails[index].Score == -1  || this.state.checkPointsDetails[index].Score == 'N/A' || this.state.checkPointsDetails[index].Score == -2 || this.state.checkPointsDetails[index].ncOFIStatus2 == 4 || this.state.checkPointsDetails[index].ncOFIStatus2 == 5 || this.state.checkPointsDetails[index].ncOFIStatus2 == 0 || this.state.checkPointsDetails[index].ncOFIStatus == 4 || this.state.checkPointsDetails[index].ncOFIStatus == 5 || this.state.checkPointsDetails[index].ncOFIStatus == 0 || this.state.checkPointsDetails[index].Scoretext == '3' || this.state.checkPointsDetails[index].Scoretext == 'Compliance' || this.state.checkPointsDetails[index].Scoretext == 'Scope to improve' ? null:<>{
                                     item.scoreType == 3 &&
                                     this.state.checkPointsDetails[index].Score !==
                                       '' &&
@@ -7520,14 +7717,18 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                       height: 40,
                                     }}>
                                     <TouchableOpacity
-                                     onPress={() => {
-                                            this.popupModal(
-                                              this.state.checkPointsDetails[index],
-                                                  this.state.checkPointList[index]);
-                                               this.setState({
-                                               Status_nc_ofi: this.state.checkPointsDetails[index].ncOFIStatus
-                                              });
-                                          }}
+                                    onPress={() => {
+  this.setState({ Status_nc_ofi_bool: true }, () => {
+    console.log(
+      'checking Details::::----Status_nc_ofi',
+      this.state.Status_nc_ofi_bool,
+    );
+    this.popupModal(
+      this.state.checkPointsDetails[index],
+      this.state.checkPointList[index]
+    );
+  });
+}}
                                       style={styles.ncofi}>
                                       <Text
                                         style={{
@@ -7538,7 +7739,7 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                        </Text>
                                    </TouchableOpacity>
                                   </View></>
-                                  }</>} 
+                                  }</>}  */}
 
 
                                   {item.scoreType == 3 &&
@@ -7551,12 +7752,9 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                   // this.state.checkPointsDetails[index].Score ==
                                   //   0 &&
                                   this.state.score_text_plsslct == false &&
-                                  (this.state.checkPointsDetails[index]
-                                    .show_nc_ofi_status == 1 ||
-                                    this.state.checkPointsDetails[index]
-                                      .show_nc_ofi_status == 2 ||
-                                    this.state.checkPointsDetails[index]
-                                      .show_nc_ofi_status == 3) &&
+                                  this.hasAnyNcOfiAction(
+                                    this.state.checkPointsDetails[index],
+                                  ) &&
                                   this.state.TemplateID !== 5 &&
                                   this.state.ischeckLPA !== true ?
                                   // &&
@@ -7579,7 +7777,9 @@ isFailureReasonValid(failureReasonId, categoryId) {
                                             color: 'white',
                                             fontFamily: 'OpenSans-Regular',
                                           }}>
-                                          NC/OFI
+                                          {this.getCheckpointNcOfiLabel(
+                                            this.state.checkPointsDetails[index],
+                                          )}
                                         </Text>
                                       </TouchableOpacity>
                                     </View>
@@ -9367,8 +9567,7 @@ isFailureReasonValid(failureReasonId, categoryId) {
                 this.state.radiovalue_ncofi == 10 ||
                 this.state.radiovalue_ncofi == 14 ||
                 this.state.radiovalue_ncofi == 15 ||
-                this.state.Status_nc_ofi == 1 ||
-                this.state.Status_nc_ofi == 2 ? (
+                this.canShowNcOption(currentNcOfiStatus) ? (
                   <TouchableOpacity onPress={this.navigateTo.bind(this, 'NC')}>
                     <View style={styles.sectionTop}>
                       <View style={styles.sectionContent}>
@@ -9383,8 +9582,7 @@ isFailureReasonValid(failureReasonId, categoryId) {
               this.state.radiovalue_ncofi == 10 ||
               this.state.radiovalue_ncofi == 14 ||
               this.state.radiovalue_ncofi == 15 ||
-              this.state.Status_nc_ofi == 3 ||
-              this.state.Status_nc_ofi == 2 ? (
+              this.canShowOfiOption(currentNcOfiStatus) ? (
                 <TouchableOpacity onPress={this.navigateTo.bind(this, 'OFI')}>
                   <View style={styles.sectionTop}>
                     <View style={styles.sectionContent}>

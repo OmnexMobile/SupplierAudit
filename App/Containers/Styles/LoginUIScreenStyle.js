@@ -247,4 +247,24 @@ export default StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
+  versionContainer: {
+    position: 'absolute',
+    bottom: 30,
+    alignSelf: 'center',
+  },
+  
+  versionText: {
+    fontSize: 12,
+    color: '#000000',
+  },
+  regVersionContainer: {
+    position: 'absolute',
+    bottom: 100,
+    alignSelf: 'center',
+  },
+  
+  regVersionText: {
+    fontSize: 12,
+    color: '#000000',
+  },
 });

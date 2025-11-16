@@ -203,6 +203,7 @@ class CheckPointScreen extends Component {
             }
 
             // console.log('//////',data[i])
+console.log('data----1111',data);
 
             checkPointList.push({
               AuditId: data[i].AuditId,
@@ -1393,6 +1394,8 @@ class CheckPointScreen extends Component {
                 if (auditRecordsOrg[p].Listdata.length > 0) {
                   for (q = 0; q < auditRecordsOrg[p].Listdata.length; q++) {
                     console.log('---->', auditRecordsOrg[p].Listdata[q])
+console.log('data----2222',auditRecordsOrg[p].Listdata[q]);
+
                     listDataArr.push({
                       ParentId: auditRecordsOrg[p].Listdata[q].ParentId,
                       Attachment: auditRecordsOrg[p].Listdata[q].Attachment,
@@ -1423,7 +1426,10 @@ class CheckPointScreen extends Component {
                       NeedScore: auditRecordsOrg[p].Listdata[q].NeedScore,
                       ScoreType: auditRecordsOrg[p].Listdata[q].ScoreType,
                       isScoreValid: auditRecordsOrg[p].Listdata[q].isScoreValid,
-                      scoreInvalidMsg: auditRecordsOrg[p].Listdata[q].scoreInvalidMsg
+                      scoreInvalidMsg: auditRecordsOrg[p].Listdata[q].scoreInvalidMsg,
+                      ncOFIStatus: auditRecordsOrg[p].Listdata[q].ByteAttachment1,
+                      ncOFIStatus2: auditRecordsOrg[p].Listdata[q].ncOFIStatus,
+
 
                     })
                   }
@@ -1454,6 +1460,8 @@ class CheckPointScreen extends Component {
                     &&
                     (listDataArr[i].ParentId == checkPointsDetails[j].ParentId)
                   ) {
+console.log('data----3333',checkPointsDetails[j]);
+                    
                     listDataArr[i] = {
                       ParentId: checkPointsDetails[j].ParentId,
                       Attachment: checkPointsDetails[j].Attachment,

@@ -7,6 +7,7 @@ import {
   Dimensions,
   TextInput,
   ImageBackground,
+  Platform
 } from 'react-native';
 import {Images} from '../Themes';
 import {connect} from 'react-redux';
@@ -48,6 +49,7 @@ class Registration extends Component {
       deviceId: '',
       type: 1,
       screenWidth: Dimensions.get('window').width,
+      appVersion : ''
     };
     console.log(
       'checking props' +
@@ -82,6 +84,8 @@ class Registration extends Component {
 
   componentDidMount() {
     Dimensions.addEventListener('change', this.handleDimensionChange);
+ const version = DeviceInfo.getVersion();
+    this.setState({ appVersion: version });
 
     async () =>{
       AsyncStorage.setItem('NCSettingvalue', JSON.stringify(data.data.Data.ncofisetting));
@@ -720,6 +724,13 @@ class Registration extends Component {
               </TouchableOpacity>
             )}
           </View>
+      {Platform.OS == 'android' ? <View style={styles.versionContainer}>
+                          <Text style={styles.versionText}>v{this.state.appVersion}</Text>
+                        </View>: <View style={styles.regVersionContainer}>
+                          <Text style={styles.regVersionText}>v{this.state.appVersion}</Text>
+                        </View>}
+
+           
         </ImageBackground>
   )}
    <Toast

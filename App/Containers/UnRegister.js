@@ -7,7 +7,8 @@ import {
   Dimensions,
   TextInput,
   BackHandler,
-  ImageBackground
+  ImageBackground,
+  Platform
 } from 'react-native';
 import {Images} from '../Themes';
 import {connect} from 'react-redux';
@@ -48,6 +49,7 @@ class UnRegister extends Component {
 
       deviceId: '',
       type: 1,
+      appVersion : ''
     };
   }
 
@@ -55,6 +57,9 @@ class UnRegister extends Component {
     this.getdeviceRegisterStatus();
     this.getDeviceId();
     console.log('unRegistration screen mounted successfully!');
+     const version = DeviceInfo.getVersion();
+    this.setState({ appVersion: version });
+
     auth.setServerUrl(this.state.serverUrl);
     if (this.props.data.audits.language === 'Chinese') {
       this.setState({ChineseScript: true}, () => {
@@ -487,7 +492,13 @@ this.props.clearURL();
           </TouchableOpacity>
         )}
       </View>
+        {Platform.OS == 'android' ? <View style={styles.versionContainer}>
+                                 <Text style={styles.versionText}>v{this.state.appVersion}</Text>
+                               </View>: <View style={styles.regVersionContainer}>
+                                 <Text style={styles.regVersionText}>v{this.state.appVersion}</Text>
+                               </View>}
     </ImageBackground>
+    
 )}
 <Toast
       ref="toast"

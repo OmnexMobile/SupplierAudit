@@ -1614,6 +1614,8 @@ async getparamsDetails(){
   updateFormUploadDetails = () => {
     console.log('this.state.formDetails', this.state.formDetails);
     var auditRecordsOrg = this.props.data.audits.auditRecords;
+    console.log('jgjhsdbfjhsbdfjsj',this.props.data.audits.auditRecords);
+    
     var auditRecords = [];
 
     for (var p = 0; p < auditRecordsOrg.length; p++) {
@@ -1843,6 +1845,7 @@ async getparamsDetails(){
                 ScoreType: auditRecordsOrg[p].Listdata[q].ScoreType,
                 isScoreValid: auditRecordsOrg[p].Listdata[q].isScoreValid,
                 scoreInvalidMsg: auditRecordsOrg[p].Listdata[q].scoreInvalidMsg,
+                ncOFIStatus: auditRecordsOrg[p].Listdata[q].ncOFIStatus,
                 nc_available_status: true,
                 ofi_avialable_status: true,
               });

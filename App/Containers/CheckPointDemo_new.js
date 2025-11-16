@@ -2930,6 +2930,10 @@ getAttachmentByFormID_TemplateID(FormId,CheckPointTemplateId,dataAttachment){
                             auditRecordsOrg[p].Listdata[q].scoreInvalidMsg,
                           immediateAction:
                             auditRecordsOrg[p].Listdata[q].immediateAction,
+                            ncOFIStatus:
+                            auditRecordsOrg[p].Listdata[q]?.ByteAttachment1,
+                            ncOFIStatus2:
+                            auditRecordsOrg[p].Listdata[q]?.ncOFIStatus
                         });
                       }
                     }

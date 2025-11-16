@@ -92,6 +92,8 @@ class AuditDashboardFooter extends Component {
   componentDidMount() {
     console.log('AuditHeader mounted.',this.props.data);
     console.log('--CurrentPage---> AuditDashboardFooter')
+    console.log('this.props.data.audits.auditRecords',this.props.data.audits.auditRecords);
+    
     this.getData();
     if (this.props.data.audits.language === 'Chinese') {
       this.setState({ChineseScript: true}, () => {
@@ -1097,6 +1099,8 @@ class AuditDashboardFooter extends Component {
                           auditRecordsOrg[p].Listdata[q].isScoreValid,
                         scoreInvalidMsg:
                           auditRecordsOrg[p].Listdata[q].scoreInvalidMsg,
+                        ncOFIStatus:
+                          auditRecordsOrg[p].Listdata[q].ncOFIStatus,
                       });
                     }
                     console.log('listDataArr', listDataArr);
