@@ -174,12 +174,12 @@ alignContent:'center',    borderWidth: 1,
     flexDirection: 'row',
     width:Window.width,
     height: 70,
-    backgroundColor: 'transparent',
+    // backgroundColor: 'red',
     //position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
     // zIndex: 40000,
-    paddingTop: 10
+    // paddingTop: 10
     //borderTopWidth:0.5
   },
   checkListDiv1:{
@@ -202,7 +202,7 @@ alignContent:'center',    borderWidth: 1,
     width: '95%',
     height: 40,
     backgroundColor:'#00A2E5',
-    borderRadius: 20,
+    borderRadius: 10,
     justifyContent: "space-around",
     alignItems: 'center',
     flexDirection:"row",

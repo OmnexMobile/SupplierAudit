@@ -17,7 +17,8 @@ export default StyleSheet.create({
     bottom: 0,
     zIndex: 60000,
     borderTopWidth:1,
-    borderTopColor:'lightgrey'
+    borderTopColor:'lightgrey',
+    backgroundColor:'white'
   },
   background: {
     position: 'absolute',

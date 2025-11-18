@@ -1090,8 +1090,8 @@ class AuditProDashboard extends Component {
             </TouchableOpacity>
           </View>
         )}
-        <ScrollView style={{backgroundColor: 'lightgrey'}}>
-          <View style={{backgroundColor: 'white'}}>
+        <ScrollView style={{backgroundColor: '#e9ebfa'}}>
+          <View style={{backgroundColor: '#e9ebfa'}}>
             <View style={styles.cardTitle}>
               <Text style={styles.cardTitleTxt}>{strings.recentactivity}</Text>
               {this.state.recent_audits.length > 2 ? (

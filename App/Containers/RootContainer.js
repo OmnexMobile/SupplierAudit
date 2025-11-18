@@ -4,7 +4,6 @@ import ReduxNavigation from '../Navigation/ReduxNavigation'
 import { connect } from 'react-redux'
 import StartupActions from '../Redux/AuditRedux'
 import ReduxPersist from '../Config/ReduxPersist'
-
 // Styles
 import styles from './Styles/RootContainerStyles'
 

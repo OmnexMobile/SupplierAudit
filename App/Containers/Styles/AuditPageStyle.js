@@ -97,7 +97,6 @@ export default StyleSheet.create({
     width: '100%',
     height: 70,
     position: 'absolute',
-    marginLeft: 25
   },
   footerLoader: {
     flexDirection: 'row',
@@ -112,7 +111,7 @@ export default StyleSheet.create({
   },
   footerDivContent: {
     flexDirection: 'row',
-    // justifyContent: 'space-between',
+  justifyContent: 'space-evenly', 
     // textAlign: 'center',
   },
 

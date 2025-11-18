@@ -7,21 +7,20 @@ import {
   Animated,
   BackHandler,
   Alert,
+  StyleSheet,
+  I18nManager,
+  Dimensions,
 } from 'react-native';
 import {Images} from '../Themes';
 import * as Animatable from 'react-native-animatable';
 import ResponsiveImage from 'react-native-responsive-image';
-import {Dimensions} from 'react-native';
 import {strings} from '../Language/Language';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-let Window = Dimensions.get('window');
-// Styles
-import styles from './Styles/LaunchScreenStyles';
-
-// Redux
+import Icon from 'react-native-vector-icons/Ionicons';
 import {connect} from 'react-redux';
-import {act} from 'react-test-renderer';
+import LinearGradient from 'react-native-linear-gradient';
+
+const {width, height} = Dimensions.get('window');
 
 class LaunchScreen extends Component {
   constructor(props) {
@@ -36,196 +35,187 @@ class LaunchScreen extends Component {
       siteId: '',
       token: '',
       isActive: false,
+      orientation: width > height ? 'landscape' : 'portrait',
     };
 
-    // this.panResponder = PanResponder.create({
-    //   onStartShouldSetPanResponder: () => true,
-    //   onPanResponderMove: Animated.event([
-    //     null,
-    //     {
-    //       dx: this.state.pan.x,
-    //      // dy: this.state.pan.y,
-    //     },
-    //   ]),
-    //   onPanResponderRelease: (e, gesture) => {
-    //     if (this.isDropZone(gesture)) {
-    //       console.log('Right location');
-    //       // this.props.navigation.navigate('AuditForm')
-    //       //this.RestoringLoginData()
-    //       this._retrieveData();
-    //       this.setState({
-    //         showDraggable: false,
-    //       });
-    //     } else {
-    //       Animated.spring(this.state.pan, {
-    //         toValue: {x: 10, y: 0},
-    //         useNativeDriver: false,
-    //       }).start();
-    //     }
-    //     console.log('onPanResponderRelease working3');
-    //   },
-    // });
+    this.thumbWidth = 50;
+    this.trackPadding = 20;
+    this.trackWidth = width - this.trackPadding * 2;
+    this.maxSwipeDistance = this.trackWidth - this.thumbWidth;
+
+    this.translateX = new Animated.Value(0);
+
+    this.labelOpacity = this.translateX.interpolate({
+      inputRange: [0, this.maxSwipeDistance],
+      outputRange: [1, 0],
+      extrapolate: 'clamp',
+    });
+
+    this.fillWidth = this.translateX.interpolate({
+      inputRange: [0, this.maxSwipeDistance],
+      outputRange: [0, this.maxSwipeDistance + this.thumbWidth],
+      extrapolate: 'clamp',
+    });
+
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: (event, gesture) => {
-        // Get the halfway mark
-        let halfway = Window.width / 2;
-    
-        // Update animated position
-        Animated.event(
-          [null, { dx: this.state.pan.x }],
-          { useNativeDriver: false }
-        )(event, gesture);
-    
-        // If dragged past halfway, remove the lock
-        if (gesture.moveX > halfway) {
-          this.setState({ showDraggable: false });
-          this._retrieveData(); // Unlock the app
-        }
-      },
-      onPanResponderRelease: (event, gesture) => {
-        if (this.isDropZone(gesture)) {
-          console.log('Right location');
-          this._retrieveData();
-          this.setState({ showDraggable: false });
-        } else {
-          // Reset the draggable back if not dragged far enough
-          Animated.spring(this.state.pan, {
-            toValue: { x: 10, y: 0 },
+      onPanResponderMove: Animated.event([null, {dx: this.translateX}], {
+        useNativeDriver: false,
+        listener: (_, gesture) => {
+          const clamped = Math.min(
+            Math.max(0, gesture.dx),
+            this.maxSwipeDistance,
+          );
+          this.translateX.setValue(clamped);
+        },
+      }),
+      onPanResponderRelease: (_, gesture) => {
+        if (gesture.dx > this.maxSwipeDistance / 2) {
+          Animated.timing(this.translateX, {
+            toValue: this.maxSwipeDistance,
+            duration: 200,
             useNativeDriver: false,
+          }).start(() => {
+            console.log('🎉 Swipe complete - unlocking!');
+            this._retrieveData();
+
+            setTimeout(() => {
+              Animated.timing(this.translateX, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: false,
+              }).start();
+            }, 1000);
+          });
+        } else {
+          Animated.spring(this.translateX, {
+            toValue: 0,
+            useNativeDriver: false, // <-- FIXED
           }).start();
         }
       },
     });
-    
-   
   }
-  componentDidUpdate(prevProps) {
-    if (prevProps.isFocused !== this.props.isFocused && this.props.isFocused) {
-      this.onScreenFocus();
-    }
-  }
+
   componentDidMount() {
-    console.log('HomeScreen mounted');
-    // console.log(data.data.Data.ncofisetting,"vb")
+    this.dimensionListener = Dimensions.addEventListener(
+      'change',
+      this.handleDimensionChange,
+    );
+
     this.onScreenFocus();
- 
-    if (this.props.data.audits.language === 'Chinese') {
+    const language = this.props.data.audits.language;
+    if (language === 'Chinese') {
       this.setState({ChineseScript: true}, () => {
         strings.setLanguage('zh');
-        this.setState({});
-        console.log('Chinese script on', this.state.ChineseScript);
-        console.log('ncbutton',this.props.data.audits.userFullName)
-
       });
-    } else if (
-      this.props.data.audits.language === null ||
-      this.props.data.audits.language === 'English'
-    ) {
+    } else {
       this.setState({ChineseScript: false}, () => {
         strings.setLanguage('en-US');
-        this.setState({});
-        console.log('Chinese script off', this.state.ChineseScript);
       });
     }
-    console.log('Launchscreen mounted successfully!', Window.width);
+
     this.RestoringLoginData();
-    /*
-    if(this.props.data.audits.smdata == null || this.props.data.audits.smdata == 0)
-    {
-      this.props.storeSupplierData(1);
-      console.log('sm data value stored as 1 instead of null..')
-    }*/
     this.setState({
       showDraggable: true,
-      width: Window.width,
+      width: width,
     });
-    console.log('onPanResponderRelease working1');
     Animated.spring(this.state.pan, {
       toValue: {x: 10, y: 0},
       useNativeDriver: false,
     }).start();
   }
+  handleDimensionChange = ({window}) => {
+    const orientation = window.width > window.height ? 'landscape' : 'portrait';
+    this.setState({orientation});
+    const newWidth = window.width;
 
-  onScreenFocus = async () => {
-    // Code to run every time the screen is focused
-    const isDeviceRegisteredLog = await AsyncStorage.getItem('isRegistered');
-    const NCSettingValue = await AsyncStorage.getItem('NCSettingValue');
-    console.log('isDeviceRegisteredLog::::::::::',isDeviceRegisteredLog);
-    console.log('NCSettingValue::::::::::',NCSettingValue);
- 
-    };
+    this.trackWidth = newWidth - this.trackPadding * 2;
+    this.maxSwipeDistance = this.trackWidth - this.thumbWidth;
+
+    this.fillWidth = this.translateX.interpolate({
+      inputRange: [0, this.maxSwipeDistance],
+      outputRange: [0, this.maxSwipeDistance + this.thumbWidth],
+      extrapolate: 'clamp',
+    });
+
+    this.labelOpacity = this.translateX.interpolate({
+      inputRange: [0, this.maxSwipeDistance],
+      outputRange: [1, 0],
+      extrapolate: 'clamp',
+    });
+
+    this.setState({width: newWidth});
+  };
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.isFocused !== this.props.isFocused && this.props.isFocused) {
+      this.onScreenFocus();
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.dimensionListener?.remove) {
+      this.dimensionListener.remove();
+    } else {
+      Dimensions.removeEventListener('change', this.handleDimensionChange); // for older RN
+    }
+  }
+
   componentWillReceiveProps() {
-    var getCurrentPage = [];
-    getCurrentPage = this.props.data.nav.routes;
-    var CurrentPage = getCurrentPage[getCurrentPage.length - 1].routeName;
-    console.log('--CurrentPage--->', CurrentPage);
-    if (CurrentPage == 'LaunchScreen') {
-      console.log('Launchscreen mounted successfully!', this.props.data);
-      console.log(
-        'checking props' +
-          this.props.data.audits.userFullName +
-          this.props.data.audits.siteId +
-          'user id:' +
-          this.props.data.audits.userId +
-          'token:' +
-          this.props.data.audits.token +
-          'isactive' +
-          this.props.data.audits.isActive +
-          'device registration status:' +
-          this.props.data.audits.isDeviceRegistered, 
-          'deviceId:' + this.props.data.audits.deviceid
+    const getCurrentPage = this.props.data.nav.routes;
+    const CurrentPage = getCurrentPage[getCurrentPage.length - 1].routeName;
 
-      );
-      this.setState({
-        showDraggable: true,
-      });
-      console.log('onPanResponderRelease working2');
+    if (CurrentPage === 'LaunchScreen') {
+      this.setState({showDraggable: true});
       Animated.spring(this.state.pan, {
         toValue: {x: 10, y: 0},
         useNativeDriver: false,
       }).start();
-    } else if (CurrentPage == 'UnRegister') {
+    } else if (CurrentPage === 'UnRegister') {
       this.props.navigation.navigate('Register');
-    } else {
-      console.log('LaunchScreen pass');
-      //this.props.navigation.navigate('Register');
     }
   }
 
-  isDropZone(gesture) {
-    var dz = this.state.dropZoneValues;
-    return gesture.moveY > dz.y && gesture.moveY < dz.y + dz.height;
-  }
-
-  setDropZoneValues(event) {
-    console.log('triggered');
-    this.setState({
-      dropZoneValues: event.nativeEvent.layout,
-    });
-  }
+  onScreenFocus = async () => {
+    const isDeviceRegisteredLog = await AsyncStorage.getItem('isRegistered');
+    const NCSettingValue = await AsyncStorage.getItem('NCSettingValue');
+    console.log('isDeviceRegisteredLog::::::::::', isDeviceRegisteredLog);
+    console.log('NCSettingValue::::::::::', NCSettingValue);
+  };
 
   RestoringLoginData = async () => {
     try {
       const active = await AsyncStorage.getItem('isActive');
-      console.log('isActive status:' + active);
-      if (active == 'yes' && this.props.data.audits.isActive == null) {
+      if (active === 'yes' && this.props.data.audits.isActive == null) {
         this.props.storeLoginSession(true);
       }
 
-      if (active == 'yes' && this.props.data.audits.userId == null) {
-        const Userid = await AsyncStorage.getItem('userId');
-        const userName = await AsyncStorage.getItem('userName');
-        const Siteid = await AsyncStorage.getItem('siteId');
-        const Token = await AsyncStorage.getItem('token');
-        const address = await AsyncStorage.getItem('address');
-        const companyname = await AsyncStorage.getItem('companyname');
-        const companyurl = await AsyncStorage.getItem('companyurl');
-        const logo = await AsyncStorage.getItem('logo');
-        const phone = await AsyncStorage.getItem('phone');
-        const deviceid = await AsyncStorage.getItem('deviceid');
-        console.log(phone,userName,Userid,deviceid,"333 details")
-        console.log('Started to store user session details in redux..');
+      if (active === 'yes' && this.props.data.audits.userId == null) {
+        const [
+          Userid,
+          userName,
+          Siteid,
+          Token,
+          address,
+          companyname,
+          companyurl,
+          logo,
+          phone,
+          deviceid,
+        ] = await Promise.all([
+          AsyncStorage.getItem('userId'),
+          AsyncStorage.getItem('userName'),
+          AsyncStorage.getItem('siteId'),
+          AsyncStorage.getItem('token'),
+          AsyncStorage.getItem('address'),
+          AsyncStorage.getItem('companyname'),
+          AsyncStorage.getItem('companyurl'),
+          AsyncStorage.getItem('logo'),
+          AsyncStorage.getItem('phone'),
+          AsyncStorage.getItem('deviceid'),
+        ]);
+
         this.props.storeUserSession(
           userName,
           Userid,
@@ -236,22 +226,8 @@ class LaunchScreen extends Component {
           companyurl,
           logo,
           phone,
-          deviceid
+          deviceid,
         );
-        console.log(
-          'session value:' +
-            userName +
-            Userid +
-            Token +
-            Siteid +
-            address +
-            companyname +
-            companyurl +
-            logo +
-            phone,
-        );
-        console.log('Stored user session details in redux..');
-        //this.props.navigation.navigate('AuditDashboard')
       }
     } catch (error) {
       console.log(error);
@@ -260,35 +236,29 @@ class LaunchScreen extends Component {
 
   _retrieveData = () => {
     try {
-      console.log('launch screen props ' + this.props.data.audits);
-      const userid = this.props.data.audits.userId;
-      const token = this.props.data.audits.token;
-      const siteid = this.props.data.audits.siteId;
-      const isActive = this.props.data.audits.isActive;
-      console.log('isactve' + this.isActive);
-      if (isActive == true) {
-        console.log('----><-----', isActive);
+      const {userId, token, siteId, isActive} = this.props.data.audits;
+      if (isActive === true) {
         if (token !== null) {
-          // this.props.navigation.navigate('AuditProDashboard')
           this.props.navigation.navigate('AuditDashboard');
         } else {
-          console.log('token was empty. so navigated to loginUIScreen...');
           this.props.navigation.navigate('LoginUIScreen');
         }
       } else {
         this.props.navigation.navigate('LoginUIScreen');
-        // this.props.navigation.navigate('AuditDashboard')
       }
     } catch (error) {
-      // Error retrieving data
       console.log('Error in saving', error);
     }
   };
 
   render() {
     return (
-      <View style={styles.mainContainer}>
-        <Image source={Images.LoginBack} style={styles.backgroundImage} />
+      <LinearGradient
+        colors={['#64C8FA', '#ffffff']}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}
+        style={styles.container}>
+        {/* <Image source={Images.LoginBack} style={styles.backgroundImage} /> */}
 
         <View style={styles.OmnexlogoDiv}>
           <View style={styles.Omnex}>
@@ -300,110 +270,69 @@ class LaunchScreen extends Component {
           </View>
         </View>
 
-        {/* <View style={styles.hint1Div}>
-          <View>
-            <Text style={styles.hint1Text}>{strings.Swipe}</Text>
-            <Text style={styles.hint2Text}>{strings.unlock}</Text>
-          </View>
-        </View> */}
-
-        <View style={styles.swipeLogo}>
-          <Animatable.View animation={'shake'} iterationCount={5000}>
-            <ResponsiveImage
-              source={Images.swipe}
-              initWidth="30"
-              initHeight="30"
-            />
-          </Animatable.View>
-        </View>
-
         <View
-          onLayout={this.setDropZoneValues.bind(this)}
-          style={styles.dropZone}>
-          <View style={styles.LockView}>
-            <ResponsiveImage
-              source={Images.LockLogo}
-              initWidth="83"
-              initHeight="83"
+          style={[
+            styles.swipeWrapper,
+            {marginBottom: this.state.orientation === 'landscape' ? 20 : 60},
+          ]}>
+          <View style={styles.track}>
+            <Animated.View
+              style={[styles.fillTrack, {width: this.fillWidth}]}
             />
+            <Animated.Text style={[styles.label, {opacity: this.labelOpacity}]}>
+              Swipe to unlock
+            </Animated.Text>
+            <Animated.View
+              style={[
+                styles.thumb,
+                {transform: [{translateX: this.translateX}]},
+              ]}
+              {...this.panResponder.panHandlers}>
+              <Icon
+                name={I18nManager.isRTL ? 'arrow-back' : 'arrow-forward'}
+                size={24}
+                color="#fff"
+              />
+            </Animated.View>
           </View>
-        </View>
-
-        {this.renderDraggable()}
-
-        <View style={styles.logoDiv}>
-         
-            {/* <ResponsiveImage
-              initWidth="609"
-              initHeight="577"
-              source={Images.humanLogo}
-              style={
-                this.state.width < 500
-                  ? styles.logoPosition
-                  : styles.logoPosition01
-              }
-            /> */}
-        
-        </View>
-        <View style={styles.msgbox}>
-          <View style={styles.Omnex00}>
-            <View>
-              {/* <Text style={styles.textFont1}>{strings.COMPREHENSIVE}</Text> */}
-            </View>
-            <View>
-              {/* <Text style={styles.textFont2}>{strings.MOBILE}</Text> */}
-            </View>
-            <View>
-              {/* <Text style={styles.textFont3}>{strings.ENETER}</Text> */}
-            </View>
-          </View>
-          {/* <View style={styles.Omnex01}>
-            <ResponsiveImage
+          {/* <View
+            style={{
+              marginTop: 20,
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              //  paddingRight: 10,
+            }}>
+            <Image
               source={Images.auditPro}
-              initWidth="200"
-              initHeight="42"
+              style={{height: 30, resizeMode: 'contain', aspectRatio: 20}}
             />
           </View> */}
         </View>
-      </View>
+      </LinearGradient>
     );
-  }
-
-  renderDraggable() {
-    if (this.state.showDraggable) {
-      return (
-        <View
-          style={
-            this.state.width < 500
-              ? styles.draggableContainer
-              : styles.draggableContainerTab
-          }>
-          <Animated.View
-            {...this.panResponder.panHandlers}
-            style={[this.state.pan.getLayout(), styles.circle]}>
-            <View style={styles.logoView}>
-              <ResponsiveImage
-                source={Images.KeyLogo}
-                initWidth="83"
-                initHeight="83"
-              />
-            </View>
-          </Animated.View>
-        </View>
-      );
-    }
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    data: state,
-  };
-};
+const mapStateToProps = state => ({
+  data: state,
+});
 
-const mapDispatchToProps = dispatch => {
-  return {
-    storeUserSession: (
+const mapDispatchToProps = dispatch => ({
+  storeUserSession: (
+    userName,
+    userId,
+    token,
+    siteId,
+    address,
+    companyname,
+    companyurl,
+    logo,
+    phone,
+    deviceid,
+  ) =>
+    dispatch({
+      type: 'STORE_USER_SESSION',
       userName,
       userId,
       token,
@@ -413,26 +342,64 @@ const mapDispatchToProps = dispatch => {
       companyurl,
       logo,
       phone,
-      deviceid
-    ) =>
-      dispatch({
-        type: 'STORE_USER_SESSION',
-        userName,
-        userId,
-        token,
-        siteId,
-        address,
-        companyname,
-        companyurl,
-        logo,
-        phone,
-        deviceid
-      }),
-    storeLoginSession: isActive =>
-      dispatch({type: 'STORE_LOGIN_SESSION', isActive}),
-    //storeSupplierData: (smdata) =>
-    //dispatch({ type: "STORE_SUPPLIER_DATA", smdata }),
-  };
-};
+      deviceid,
+    }),
+  storeLoginSession: isActive =>
+    dispatch({type: 'STORE_LOGIN_SESSION', isActive}),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(LaunchScreen);
+
+const styles = StyleSheet.create({
+  container: {flex: 1},
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+    resizeMode: 'cover',
+  },
+  OmnexlogoDiv: {
+    marginTop: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  Omnex: {padding: 10},
+  swipeWrapper: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    marginBottom: 80,
+    alignItems: 'center',
+  },
+  track: {
+    width: width - 70,
+    height: 60,
+    borderRadius: 50,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  fillTrack: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#fff',
+    borderRadius: 50,
+  },
+  label: {
+    position: 'absolute',
+    alignSelf: 'center',
+    color: '#333',
+    fontWeight: 'bold',
+    fontSize: 16,
+    zIndex: 1,
+  },
+  thumb: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#70c6f8',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    left: 0,
+    elevation: 5,
+    zIndex: 2,
+  },
+});

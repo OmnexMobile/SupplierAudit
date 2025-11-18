@@ -6,7 +6,7 @@ import RootContainer from './RootContainer'
 import createStore from '../Redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import { Bubbles, DoubleBounce, Bars, Pulse } from 'react-native-loader';
-import { View, Image, Dimensions, Alert } from 'react-native'
+import { View, Image, Dimensions, Alert, Platform } from 'react-native'
 import { Images } from '../Themes';
 import ResponsiveImage from 'react-native-responsive-image';
 // import firebase from 'react-native-firebase';
@@ -15,9 +15,16 @@ import DeviceInfo from "react-native-device-info";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // create our store
 const { store, persistor } = createStore()
-console.disableYellowBox = true;
+import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context'
 const window_width = Dimensions.get('window').width
 const window_height = Dimensions.get('window').height
+const ANDROID_15_API_LEVEL = 35
+const isAndroid15OrAbove =
+  Platform.OS === 'android' && Number(Platform.Version) >= ANDROID_15_API_LEVEL
+const android15SafeAreaStyle = isAndroid15OrAbove
+  ? { marginBottom: initialWindowMetrics?.insets.bottom ?? 0 }
+  : undefined
+  console.disableYellowBox = true;
 
 /**
  * Provides an entry point into our application.  Both index.ios.js and index.android.js
@@ -187,6 +194,7 @@ class App extends Component {
   
   render () {
     return (
+      <SafeAreaProvider style={android15SafeAreaStyle}>
       <Provider store={store}>
         <PersistGate onBeforeLift={this.onBeforeLift} persistor={persistor}>
           {(this.state.isAppLoaded) ? 
@@ -212,6 +220,7 @@ class App extends Component {
           }
         </PersistGate>
       </Provider>
+      </SafeAreaProvider>
     )
   }
 }

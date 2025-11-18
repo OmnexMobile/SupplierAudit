@@ -1,10 +1,11 @@
 import {StyleSheet} from 'react-native'
 import {Fonts, Metrics, Colors} from '../../Themes/'
-
+import { AndroidInsets, android15HeaderPadding,android15FooterPadding } from '../../Themes/AndroidInsets'
 export default StyleSheet.create({
   applicationView: {
     flex: 1,
-  },
+  paddingTop: android15HeaderPadding,
+},
   applicationViewIos: {
     flex: 1,
     backgroundColor:'#000'

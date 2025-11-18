@@ -6,6 +6,7 @@ export default styles = StyleSheet.create({
   mainContainer: {
     width: '100%',
     height: '100%',
+    backgroundColor: '#e9ebfa'
   },
   welcomeTxtView: {
     maxWidth: '70%',
@@ -97,7 +98,7 @@ export default styles = StyleSheet.create({
     fontFamily: 'OpenSans-SemiBold',
   },
   showMyAll: {
-    backgroundColor: 'lightgrey',
+    backgroundColor: '#e9ebfa',
     paddingVertical: 6,
     width: '100%',
   },
@@ -111,14 +112,14 @@ export default styles = StyleSheet.create({
   },
   cardTitleTxt: {
     fontSize: 18,
-    color: 'grey',
+    color: 'black',
     // fontWeight:'bold',
-    fontFamily: 'OpenSans-BoldItalic',
+    fontFamily: 'OpenSans-SemiBold',
   },
   moreTxt: {
     fontSize: 16,
     color: '#00A2E5',
-    fontFamily: 'OpenSans-Regular',
+    fontFamily: 'OpenSans-SemiBold',
   },
   cardOuterView: {
     width: '90%',

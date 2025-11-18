@@ -112,13 +112,13 @@ export default StyleSheet.create({
     bottom: 0,
   },
   logoPosition:{
-    height:Window.height/1.75,
+    height:Window.height/2.2,
     width:Window.width,
   },
   logoPosition01:{
     height:Window.height/1.3,
     width:Window.width,
-    top:100
+   // top:100
   },
   OmnexlogoDiv:{
     position: 'absolute',
@@ -217,5 +217,16 @@ export default StyleSheet.create({
     justifyContent: 'center',
     top:height(32),
     backgroundColor: 'transparent'
-  }
+  },
+  versionContainer: {
+    position: 'absolute',
+    bottom: 10,
+    alignSelf: 'center',
+  },
+  
+  versionText: {
+    fontSize: 12,
+    color: '#888',
+  },
+  
 })
