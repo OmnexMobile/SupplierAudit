@@ -39,15 +39,7 @@ class AuditCard extends Component {
   changeDateFormatCard = inDate => {
     if (inDate) {
       var DefaultFormatL = this.state.selectedFormat;// + ' ' + 'HH:mm';
-      var sDateArr = inDate.split('T');
-      var sDateValArr = sDateArr[0].split('-');
-      var sTimeValArr = sDateArr[1].split(':');
-      var outDate = new Date(
-        sDateValArr[0],
-        sDateValArr[1] - 1,
-        sDateValArr[2]
-      );
-      return Moment(outDate).format(DefaultFormatL);
+      return Moment.utc(inDate).local().format(DefaultFormatL);
     }
   };
 
@@ -199,77 +191,116 @@ class AuditCard extends Component {
   //   <Text numberOfLines={1} style={[styles.paddingTop5,whitneyBook_14,thickGrey,{fontFamily:'OpenSans-Regular'}]}>{item.AuditProgramName}</Text>
 
   render() {
-    const {item, index, length} = this.props;
-    console.log(item, 'itemconsolenoti');
+    const { item, index } = this.props;
+  
     return (
-      <View>
-                <View style={{flex:0.5,backgroundColor:'#fff',margin:10,borderRadius:5,flexDirection:'row',
-                elevation:3,shadowColor: Platform.OS === 'ios' ? '#D3D3D3' : '#000',
-                shadowOffset: { width: 5, height: 5 }, shadowOpacity: 5,
-}}>
-                  <View style={{flex:0.020,
-                  backgroundColor: this.getColorCode(item.cStatus), margin:10}}></View>
-                  <TouchableOpacity key={index} onPress={() => this.openAuditPage(item)}>
-      
-              {/*<Text numberOfLines={1} style={[whitneyBook_17,viley,{fontFamily:'OpenSans-Regular'}]}>{item.Auditee}</Text>*/}
-              <View style={{margin:10}}>
-              <Text
-                numberOfLines={1}
-                style={[
-                  {
-                    fontFamily: 'OpenSans-Regular',
-                    color: 'rgba(36,236,206,255)',
-                  },
-                ]}>
-                {item.Auditee}
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={[{fontFamily: 'OpenSans-Regular', color: 'black'}]}>
-                {this.changeDateFormatCard(item.StartDate)} - {' '}
-                {this.changeDateFormatCard(item.EndDate)}
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={[{fontFamily: 'OpenSans-Regular', color: 'black'}]}>
-                {item.AuditTypeName}
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={[{fontFamily: 'OpenSans-Regular', color: 'black'}]}>
-                {item.AuditNumber}
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={[{fontFamily: 'OpenSans-Regular', color: 'black'}]}>
-                {item.cStatus == 'Deadline Violated and Completed'
-                  ? 'D.Violated & Completed'
-                  : item.cStatus}
-                  
-              </Text>
-              </View>
-              
-              {/*
-                        <Text numberOfLines={1} style={[whitneyBook_12,slideGrey,{fontFamily:'OpenSans-Regular'}]}>{this.changeDateFormatCard(item.StartDate)} - {this.changeDateFormatCard(item.EndDate)}</Text>
-                        <Text numberOfLines={1} style={[whitneyBook_14, thickGrey,{fontFamily:'OpenSans-Regular'}]}>{item.AuditTypeName}</Text>
-                        <Text numberOfLines={1} style={[whitneyBook_14, thickGrey,{fontFamily:'OpenSans-Regular'}]}>{item.AuditNumber}</Text>
-                        */}
+      <View style={{ marginHorizontal: 12, marginTop: 10 }}>
+        <TouchableOpacity
+          key={index}
+          activeOpacity={0.85}
+          style={{
+            backgroundColor: '#fff',
+            borderRadius: 8,
+            flexDirection: 'row',
+            elevation: 4,
+            shadowColor: '#000',
+            shadowOpacity: 0.1,
+            shadowOffset: { width: 0, height: 2 },
+            padding: 12,
+          }}
+          onPress={() => this.openAuditPage(item)}
+        >
+          {/* Colored Status Strip */}
+          <View
+            style={{
+              width: 6,
+              backgroundColor: this.getColorCode(item.cStatus),
+              borderRadius: 3,
+              marginRight: 12,
+            }}
+          />
+  
+          {/* Audit Info */}
+          <View style={{ flex: 1 }}>
+            <Text
+              numberOfLines={1}
+              style={{
+                fontFamily: 'OpenSans-SemiBold',
+                fontSize: 16,
+                color: '#00b3d6',
+                marginBottom: 4,
+              }}
+            >
+              {item.Auditee}
+            </Text>
+  
+            <Text
+              numberOfLines={1}
+              style={{
+                fontFamily: 'OpenSans-Regular',
+                fontSize: 14,
+                color: '#333',
+                marginBottom: 2,
+              }}
+            >
+              {this.changeDateFormatCard(item.StartDate)} - {this.changeDateFormatCard(item.EndDate)}
+            </Text>
+  
+            <Text
+              numberOfLines={1}
+              style={{
+                fontFamily: 'OpenSans-Regular',
+                fontSize: 14,
+                color: '#444',
+                marginBottom: 2,
+              }}
+            >
+              {item.AuditTypeName}
+            </Text>
+  
+            <Text
+              numberOfLines={1}
+              style={{
+                fontFamily: 'OpenSans-Regular',
+                fontSize: 14,
+                color: '#555',
+                marginBottom: 2,
+              }}
+            >
+              {item.AuditNumber}
+            </Text>
+  
+            <Text
+              numberOfLines={1}
+              style={{
+                fontFamily: 'OpenSans-Regular',
+                fontSize: 14,
+                color:
+                  item.cStatus === 'Deadline Violated and Completed' ? '#111' : '#111',
+              }}
+            >
+              {item.cStatus === 'Deadline Violated and Completed'
+                ? 'D.Violated & Completed'
+                : item.cStatus}
+            </Text>
+          </View>
         </TouchableOpacity>
-                  </View>
-        
+  
+        {/* Toast Message */}
         <Toast
           ref="toast"
-          style={{backgroundColor: 'black', margin: 20}}
+          style={{ backgroundColor: 'black', margin: 20 }}
           position="top"
           positionValue={0}
           fadeInDuration={750}
           fadeOutDuration={1000}
           opacity={0.8}
-          textStyle={{color: 'white'}}
+          textStyle={{ color: 'white' }}
         />
       </View>
     );
   }
+  
 }
 
 const Root = withNavigation(AuditCard);

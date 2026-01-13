@@ -17,7 +17,7 @@ export default StyleSheet.create({
     flexDirection: 'row',
     //backgroundColor: 'white',
     padding: 5,
-    paddingTop: 5 + android15HeaderPadding,
+    // paddingTop: 5 + android15HeaderPadding,
     alignItems: 'center',
     justifyContent: 'center',
     height: 60,

@@ -414,7 +414,74 @@ class CreateNC extends Component {
         ? this.props.navigation.state.params.AuditID
         : this.props.navigation.state.params.NCOFIDetails.AuditID,
     );
+    console.log('checkthink090909090idddd',this.props.navigation?.state?.params?.data);
+    console.log('checkthink09090909088888userrrr',this.props.data?.audits?.auditRecords?.[0]?.DropDownProps?.Users);
 
+   const users =
+  this.props.data?.audits?.auditRecords?.[0]?.DropDownProps?.Users || [];
+
+let responsibiityUser = { value: null, id: null };
+
+// CASE 1 — userDrop is STRING (name)
+if (typeof this.props.navigation?.state?.params?.data?.userDrop === "string") {
+  console.log("CASE 1: string");
+
+  const nameValue = this.props.navigation.state.params.data.userDrop;
+
+  const matchedUser = users.find(
+    u => u.Name?.toLowerCase() === nameValue?.toLowerCase()
+  );
+
+  if (matchedUser) {
+    responsibiityUser = {
+      value: matchedUser.Name,
+      id: matchedUser.userid,
+    };
+  }
+}
+
+// CASE 3 — userDrop is OBJECT { id, value }
+else if (
+  typeof this.props.navigation?.state?.params?.data?.userDrop === "object" &&
+  this.props.navigation.state.params.data.userDrop !== null
+) {
+  console.log("CASE 3: object");
+
+  const incomingId = Number(
+    this.props.navigation.state.params.data.userDrop.id
+  );
+
+  const matchedUser = users.find(u => Number(u.userid) === incomingId);
+
+  if (matchedUser) {
+    responsibiityUser = {
+      value: matchedUser.Name,
+      id: matchedUser.userid,
+    };
+  }
+}
+
+// CASE 2 — ResponsibilityUser numeric id
+else {
+  console.log("CASE 2: ResponsibilityUser");
+
+  const incomingId = Number(
+    this.props.navigation?.state?.params?.data?.ResponsibilityUser
+  );
+
+  const matchedUser = users.find(u => Number(u.userid) === incomingId);
+
+  if (matchedUser) {
+    responsibiityUser = {
+      value: matchedUser.Name,
+      id: matchedUser.userid,
+    };
+  }
+}
+
+console.log("✅ FINAL responsibiityUser:", responsibiityUser);
+
+    
     for (var i = 0; i < auditRecords.length; i++) {
       var auid =
         typeof this.props.navigation.state.params.NCOFIDetails == 'string'
@@ -506,8 +573,8 @@ class CreateNC extends Component {
           NCcategoryt: this.props.navigation.state.params.data
             ? this.props.navigation.state.params.data.categoryDrop
             : undefined,
-          NCrequestby: this.props.navigation.state.params.data
-            ? this.props.navigation.state.params.data.userDrop
+          NCrequestby: this.props?.navigation?.state?.params?.data
+            ? responsibiityUser
             : undefined, 
           NCdept: this.props.navigation.state.params.data
             ? this.props.navigation.state.params.data.deptDrop
@@ -1910,7 +1977,7 @@ class CreateNC extends Component {
         selectedItemsProcess: processListIntArr,
         displayData: this.state.ncData.requiretext,
         NCcategoryt: this.state.ncData.categoryDrop,
-        NCrequestby: this.state.ncData.requestDrop,
+        NCrequestby: this.state.ncData?.requestDrop,
         NCdept: this.state.ncData.deptDrop,
         NCFailure: this.state.ncData.failureDrop,
         nonconfirmityText: this.state.ncData.NonConfirmity,
@@ -2332,7 +2399,7 @@ class CreateNC extends Component {
               this.state.fileArrayList,
             );
 
-            console.log('########fileNames-----------11111', this.state.NCcategoryt,this.state.NCrequestby);
+            // console.log('########fileNames-----------11111', this.state.NCcategoryt,this.state.NCrequestby);
 
             BundleArr = {
               requiretext:
@@ -2509,7 +2576,7 @@ class CreateNC extends Component {
               // alert('Please select all mandatory fields111');
             }
           } else {
-            console.log('########fileNames-----------2222', this.state.NCcategoryt,this.state.NCrequestby);
+            // console.log('########fileNames-----------2222', this.state.NCcategoryt,this.state.NCrequestby);
             this.setState({isSaved: false}, () => {
               // , MarkClause: true
               // ---> this.refs.toast.show(strings.Clauses,DURATION.LENGTH_LONG)
@@ -3848,7 +3915,7 @@ class CreateNC extends Component {
                         <Dropdown ref="responsibleTxtField"         
                           value={
                             this.state.NCrequestby
-                              ? this.state.NCrequestby.value
+                              ? this.state.NCrequestby?.value
                               : ''
                           }
                           label={strings.ResponsibilityL}

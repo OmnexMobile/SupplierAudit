@@ -1210,7 +1210,8 @@ class AuditProDashboard extends Component {
 
   render_header() {
     return (
-      <ImageBackground source={Images.DashboardBG} style={styles.header}>
+      // <ImageBackground source={Images.DashboardBG} style={styles.header}>
+      <View style={styles.header}>
         <View style={styles.welcomeTxtView}>
           <Text style={styles.welcomeTxt}>
             {strings.welcome + '  '}
@@ -1234,7 +1235,7 @@ class AuditProDashboard extends Component {
           <TouchableOpacity
             style={styles.SiteIcon}
             onPress={() => this.props.navigation.navigate('UserPreference')}>
-            <Icon name="gear" size={20} color="white" />
+            <Icon name="gear" size={20} color="black" />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.bellIcon}
@@ -1245,14 +1246,14 @@ class AuditProDashboard extends Component {
               // this.state.notifybadge.length === 0 ? this.refs.toast.show(strings.nonewnotificationfound, DURATION.LENGTH_LONG)
               // : this.props.navigation.navigate('AuditNotifications', { notifications: this.state.notifybadge })
             }>
-            <Icon name={'bell'} size={20} color={'white'} />
+            <Icon name={'bell'} size={20} color={'black'} />
             {this.state.ShowNotifyBadge > 0 ? (
               <View style={styles.bellBadge}>
                 <Text
                   numberOfLines={1}
                   style={{
                     fontSize: 12,
-                    color: 'white',
+                    color: 'black',
                     fontFamily: 'OpenSans-Regular',
                   }}>
                   {this.state.ShowNotifyBadge}
@@ -1266,10 +1267,11 @@ class AuditProDashboard extends Component {
                 fromDashBoard: true,
               })
             }>
-            <Icon name="search" size={20} color="white" />
+            <Icon name="search" size={20} color="black" />
           </TouchableOpacity>
         </View>
-      </ImageBackground>
+        </View>
+      // </ImageBackground>
     );
   }
 

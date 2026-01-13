@@ -40,7 +40,7 @@ export default StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    width: width(70),
+    width: width(65),
     height: 65,
   },
   headingText: {
@@ -55,7 +55,7 @@ export default StyleSheet.create({
     backgroundColor: 'transparent',
     width: width(10),
     height: 65,
-    justifyContent: 'center',
+    // justifyContent: 'center',
     alignItems: 'center',
   },
   headerDiv: {

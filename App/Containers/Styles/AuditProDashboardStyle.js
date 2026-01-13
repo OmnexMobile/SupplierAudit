@@ -17,6 +17,7 @@ export default styles = StyleSheet.create({
     height: 50,
     alignItems: 'center',
     flexDirection: 'row',
+    backgroundColor:'white',
   },
   headerIcon: {
     flex: 1,
@@ -27,7 +28,7 @@ export default styles = StyleSheet.create({
   },
   welcomeTxt: {
     fontSize: Fonts.size.h6,
-    color: 'white',
+    color: 'black',
     fontFamily: 'OpenSans-Bold',
   },
   bellIcon: {
@@ -66,14 +67,14 @@ export default styles = StyleSheet.create({
     justifyContent: 'flex-start',
     backgroundColor: '#fff',
     borderRadius: 5,
-    shadowOffset: {width: 5, height: 5},
+    shadowOffset: {width: 7, height: 7},
     shadowColor: Platform.OS === 'ios' ? '#D3D3D3' : '#000',
-    shadowOpacity: 5,
-    elevation: 5,
+    shadowOpacity: 8,
+    elevation: 7,
   },
   statusheaderTxt: {
     fontSize: 30,
-    color: 'grey',
+    color: 'black',
     textAlign: 'center',
     fontFamily: 'OpenSans-SemiBold',
   },

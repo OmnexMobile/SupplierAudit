@@ -51,21 +51,25 @@ class CameraCapture extends Component {
   }roid
   componentDidMount = async () => {
     console.log('camera:capture mounted');
-    let Files = '/' + RNFetchBlob.fs.dirs.DocumentDir + '/' + (Platform.OS == 'ios' ? 'IosFiles' : 'AuditFiles');
-    console.log('camera:Ios-Android-Path', Files);
-    RNFetchBlob.fs.exists(Files).then(exist => {
+    const filesDir = this.getCaptureDir();
+    console.log('camera:Ios-Android-Path', filesDir);
+    RNFetchBlob.fs.exists(filesDir).then(exist => {
       if (!exist || exist == '') {
         RNFetchBlob.fs
-          .mkdir(Files)
+          .mkdir(filesDir)
           .then(data => {
             console.log('camera:data directory created', data);
           })
           .catch(err => {
             console.log('err', err);
           });
-      } else if (RNFetchBlob.fs.isDir(Files)) {
-        RNFetchBlob.fs.ls(Files).then(data => {
-          console.log('camera:All files', data);
+      } else {
+        RNFetchBlob.fs.isDir(filesDir).then(isDir => {
+          if (isDir) {
+            RNFetchBlob.fs.ls(filesDir).then(data => {
+              console.log('camera:All files', data);
+            });
+          }
         });
       }
     });
@@ -159,17 +163,17 @@ class CameraCapture extends Component {
     }
   }
  
-  storePhotoEdited = () => {
-    console.log('Camera:storePhotoEdited', this.state.capturedImagePath);
+  storePhotoEdited = editedPath => {
+    const sourcePath = editedPath || this.state.capturedImagePath;
+    console.log('Camera:storePhotoEdited', sourcePath);
+    console.log('Camera:Editor path', editedPath);
     // console.log('Date ==>', this.state.timestamp)
     console.log('Camera:CAptured time', this.timestamp());
-    var filepath = undefined;
-    var newImgPath = '/' + RNFetchBlob.fs.dirs.DocumentDir + '/' + (Platform.OS == 'ios' ? 'IosFiles' : 'AuditFiles');
-   {
-      console.log(this.state.capturedImagePath, 'capturedilepat');
-      filepath = (Platform.OS == 'android' ? 'file:/'+this.state.capturedImagePath : this.state.capturedImagePath);
-      console.log(filepath, 'camera:filepath');
-    }
+    const capturePath = this.normalizePath(sourcePath);
+    const newImgPath = this.getCaptureDir();
+    const filepath = this.getFileUri(capturePath);
+    console.log(capturePath, 'capturedilepat');
+    console.log(filepath, 'camera:filepath');
  
     ImageMarker.markText({
       src: filepath,
@@ -194,24 +198,26 @@ class CameraCapture extends Component {
         let timeStamp = Moment().unix();
           console.log('Camera:fetch data', data);
           console.log('Camera:newImgPath--->', newImgPath);
-          const uripath =
-            newImgPath + '/' + 'CapturedImage_' + timeStamp + '.jpg';
-          RNFetchBlob.fs.writeFile(uripath, data, 'base64').then(data => {
+          const fileName = 'CapturedImage_' + timeStamp + '_edited.jpg';
+          const uripath = newImgPath + '/' + fileName;
+          const cleanedData =
+            typeof data === 'string' ? data.replace(/\s/g, '') : data;
+          RNFetchBlob.fs.writeFile(uripath, cleanedData, 'base64').then(data => {
             console.log('Camera:File added sucessfully');
           }).then((res)=> {
             this.setState(
               {
                 captureState: 'Captured',
                 imageData: 'Camera photo added',//data,
-                imageName: 'CapturedImage_' + timeStamp + '.jpg',
+                imageName: fileName,
                 imageType: 'image/jpg',
                 imageURI: uripath,
                 capturedImagePath: uripath
               },
-              () => {
+            () => {
                 console.log('Camera:Capture Success URI.', this.state.imageURI);
                   //Deleting the Captured image after edit operation performed,
-                this.deleteImageAfterEdit(filepath);
+                this.deleteImageAfterEdit(capturePath, uripath);
               },
             );
           
@@ -262,7 +268,7 @@ class CameraCapture extends Component {
   }
   capturePhoto = async () => {
     var ImgPath = '';
-    var newImgPath = '/' + RNFetchBlob.fs.dirs.DocumentDir + '/' + (Platform.OS == 'ios' ? 'IosFiles' : 'AuditFiles');
+    const captureDir = this.getCaptureDir();
     if (this.camera) {
       console.log('ccenter');
       const photo = await this.camera.takePhoto({
@@ -275,13 +281,13 @@ class CameraCapture extends Component {
       let extn = filename.substring(filename.lastIndexOf('.')+1);
       var newfileName = 'CapturedImage_' + Moment().unix() + '.' + extn;
       try {
-        ImgPath = '/' + photo.path.replace('file:/', '');
+        ImgPath = this.normalizePath(photo.path);
         var data = await RNFS.readFile(
           ImgPath,
           'base64',
         ).then(res => {
           console.log('camera: ImgPath res', ImgPath, res)
-          newImgPath = newImgPath + '/' + newfileName;
+          const newImgPath = captureDir + '/' + newfileName;
           console.log('camera:New ImgPath', newImgPath)
         RNFetchBlob.fs.writeFile(
           newImgPath,
@@ -300,7 +306,7 @@ class CameraCapture extends Component {
           // } else
           {
           RNPhotoEditor.Edit({
-            path: this.state.capturedImagePath,
+            path: newImgPath,
             onDone: this.storePhotoEdited,
             onCancel: this.retakePhoto,
  
@@ -332,16 +338,28 @@ class CameraCapture extends Component {
     }
   };
  
-  async deleteImageAfterEdit(filepath){
-    console.log("Camera: Delete file path",filepath);
-  if(RNFetchBlob.fs.isDir(filepath)){
-    await RNFetchBlob.fs.unlink(filepath).then(() => {
+  async deleteImageAfterEdit(filepath, keepPath){
+    const normalizedFile = this.normalizePath(filepath);
+    const normalizedKeep = this.normalizePath(keepPath);
+    if (!normalizedFile) {
+      return;
+    }
+    if (normalizedKeep && normalizedFile === normalizedKeep) {
+      console.log('Camera: Skip delete, same path', normalizedFile);
+      return;
+    }
+    console.log("Camera: Delete file path", normalizedFile);
+    try {
+      const exists = await RNFetchBlob.fs.exists(normalizedFile);
+      if (!exists) {
+        console.log('Camera:Captured old missing', normalizedFile);
+        return;
+      }
+      await RNFetchBlob.fs.unlink(normalizedFile);
       console.log('Camera:Captured old Deleted!!');
-    })
-    .catch ((err) => {
-      console.log('Camera:Captured old NOT Deleted!!',err);
-    });
-  }
+    } catch (err) {
+      console.log('Camera:Captured old NOT Deleted!!', err);
+    }
   }
  
   retakePhoto = () => {
@@ -380,12 +398,44 @@ class CameraCapture extends Component {
       this.props.navigation.goBack();
     }, 500);
   };
+
+  normalizePath(path) {
+    if (!path) {
+      return '';
+    }
+    const withoutScheme = path.replace(/^file:(\/\/)?/, '');
+    return withoutScheme.replace(/^\/+/, '/');
+  }
+
+  getCaptureDir() {
+    const baseDir = this.normalizePath(RNFetchBlob.fs.dirs.DocumentDir);
+    const folderName = Platform.OS == 'ios' ? 'IosFiles' : 'AuditFiles';
+    return `${baseDir}/${folderName}`;
+  }
+
+  getFileUri(path) {
+    if (!path) {
+      return '';
+    }
+    if (path.startsWith('file://') || path.startsWith('content://')) {
+      return path;
+    }
+    const normalizedPath = this.normalizePath(path);
+    if (!normalizedPath) {
+      return '';
+    }
+    return `file://${normalizedPath}`;
+  }
  
   render() {
     console.log(this.state.devices, 'devices');
     //console.log(this.state.devices.position,"Pose")
     console.log(this.state.captureState, 'devices');
     console.log(this.state.capturedImagePath, 'capturedimagepath');
+    console.log(
+      'camera:capturedImageUri',
+      this.getFileUri(this.state.capturedImagePath),
+    );
     return (
       <View style={styles.wrapper}>
         <OfflineNotice />
@@ -478,7 +528,7 @@ class CameraCapture extends Component {
               </Text>
            
                 <Image
-                  source={{uri: 'file:/' + this.state.capturedImagePath}}
+                  source={{uri: this.getFileUri(this.state.capturedImagePath)}}
                   style={{
                     width: width(90),
                     height: height(65),
