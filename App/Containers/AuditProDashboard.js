@@ -439,7 +439,7 @@ class AuditProDashboard extends Component {
   //Version Check
   checkAppVersion = async () => {
       try {
-        const latestVersion = Platform.OS === 'ios'? await fetch(`https://itunes.apple.com/in/lookup?bundleId=org.omnex.auditpro`)
+        const latestVersion = Platform.OS === 'ios'? await fetch(`https://itunes.apple.com/in/lookup?bundleId=com.omnex.suppliermanagement`)
                 .then(r => r.json())
                 .then((res) => { return res?.results[0]?.version })
                 : await VersionCheck.getLatestVersion({

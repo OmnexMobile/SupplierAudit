@@ -1,0 +1,65 @@
+diff --git a/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureColorSpace+descriptor.swift b/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureColorSpace+descriptor.swift
+index 13a403b..48fa031 100644
+--- a/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureColorSpace+descriptor.swift
++++ b/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureColorSpace+descriptor.swift
+@@ -38,7 +38,7 @@ extension AVCaptureColorSpace {
+     case .sRGB:
+       return "srgb"
+     default:
+-      fatalError("AVCaptureDevice.Position has unknown state.")
++      return "unknown"
+     }
+   }
+ }
+diff --git a/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureDevice.DeviceType+descriptor.swift b/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureDevice.DeviceType+descriptor.swift
+index ae0f966..cc962e3 100644
+--- a/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureDevice.DeviceType+descriptor.swift
++++ b/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureDevice.DeviceType+descriptor.swift
+@@ -32,7 +32,7 @@ extension AVCaptureDevice.DeviceType {
+       return "wide-angle-camera"
+     default:
+       // e.g. `.builtInTrueDepthCamera`
+-      fatalError("AVCaptureDevice.Position has unknown state.")
++      return "wide-angle-camera"
+     }
+   }
+ }
+diff --git a/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureDevice.Format.AutoFocusSystem+descriptor.swift b/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureDevice.Format.AutoFocusSystem+descriptor.swift
+index 439c3e1..cd5230d 100644
+--- a/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureDevice.Format.AutoFocusSystem+descriptor.swift
++++ b/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureDevice.Format.AutoFocusSystem+descriptor.swift
+@@ -34,7 +34,7 @@ extension AVCaptureDevice.Format.AutoFocusSystem {
+     case .none:
+       return "none"
+     @unknown default:
+-      fatalError("AVCaptureDevice.Format has unknown state.")
++      return "none"
+     }
+   }
+ }
+diff --git a/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureDevice.Position+descriptor.swift b/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureDevice.Position+descriptor.swift
+index e0445cb..624ca01 100644
+--- a/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureDevice.Position+descriptor.swift
++++ b/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureDevice.Position+descriptor.swift
+@@ -19,7 +19,7 @@ extension AVCaptureDevice.Position {
+     case .unspecified:
+       return "unspecified"
+     @unknown default:
+-      fatalError("AVCaptureDevice.Position has unknown state.")
++      return "unspecified"
+     }
+   }
+ }
+diff --git a/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureVideoStabilizationMode+descriptor.swift b/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureVideoStabilizationMode+descriptor.swift
+index b91c5fc..e305915 100644
+--- a/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureVideoStabilizationMode+descriptor.swift
++++ b/node_modules/react-native-vision-camera/ios/Parsers/AVCaptureVideoStabilizationMode+descriptor.swift
+@@ -55,7 +55,7 @@ extension AVCaptureVideoStabilizationMode {
+     case .standard:
+       return "standard"
+     default:
+-      fatalError("AVCaptureVideoStabilizationMode has unknown state.")
++      return "standard"
+     }
+   }
+ }

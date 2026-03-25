@@ -212,7 +212,7 @@ class UserPreference extends React.Component {
         const redirectUri =
           Platform.OS == 'ios'
             ? 'com.omnex.suppliermanagement'
-            : 'com.omnex.suppliermanagement';
+            : 'com.omnex.auditpro';
         let myConfig = {
           issuer: this.state.ssoConfigObj.issuer, //'https://aser0001.ww.faurecia.com',
           serviceConfiguration: {
@@ -508,7 +508,7 @@ class UserPreference extends React.Component {
       const latestVersion =
         Platform.OS === 'ios'
           ? await fetch(
-              `https://itunes.apple.com/in/lookup?bundleId=org.omnex.auditpro`,
+              `https://itunes.apple.com/in/lookup?bundleId=com.omnex.suppliermanagement`,
             )
               .then(r => r.json())
               .then(res => {

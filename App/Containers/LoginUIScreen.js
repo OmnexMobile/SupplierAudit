@@ -975,13 +975,13 @@ console.log( LoggedUserDetails[0].audits.siteId,"siteidinlogin");
 
       console.log('SSO Config1:', myConfig);
       const resultAuth = await authorize(myConfig);
-      /* const id = resultAuth.idToken;
+       const id = resultAuth.idToken;
       const logauth = await logout(myConfig, {
         idToken : id,
-        postLogoutRedirectUrl : 'org.omnex.auditpro:/'
+        postLogoutRedirectUrl : 'com.omnex.suppliermanagement:/'
       });
     
-      console.log('logauth', logauth);*/
+      console.log('logauth', logauth);
 
       console.log(resultAuth, 'resultauth');
       await AsyncStorage.setItem('ssologinstatusbool', "true");

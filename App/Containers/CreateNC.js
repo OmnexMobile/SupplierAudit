@@ -187,6 +187,7 @@ class CreateNC extends Component {
       recommAction: '',
       breadCrumbText: undefined,
       dialogVisible: false,
+      dialogVisibleAttach: false,
       ProcessType: 1,
       startVoice: false,
       /** voice states */
@@ -213,6 +214,8 @@ class CreateNC extends Component {
       requestDropdown: [],
       clauseMandatory: 0,
       fileArrayList: [],
+      cAttachData: '',
+      cAttachType: '',
       selectedItemsProcessDumm: [],
       fileType: '', // 'pdf', 'txt', 'xls', 'png', or other values to indicate the file type
       fileContent: null,
@@ -1029,7 +1032,9 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
 
   openAttachmentFile = path => {
     console.log(path, 'Attachment:path');
-    if (path == null || typeof path == 'undefined' || path == '') return;
+    const viewerPath = this.getAttachmentViewerPath(path);
+    const previewPath = this.normalizeAttachmentUri(path);
+    if (!viewerPath && !previewPath) return;
     // const fpath = FileViewer.open('file:/' + path) // absolute-path-to-my-local-file.
     //   .then(() => {
     //     console.log('Attachmentfile opened');
@@ -1038,14 +1043,86 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
     //     console.log('Attachmentfile opened error', err);
     //   });
 
-    FileViewer.open(path, {showOpenWithDialog: true})
+    FileViewer.open(viewerPath || previewPath, {showOpenWithDialog: true})
       .then(() => {
         // success
-        console.log('SUCESSSSSPATH-----------', path);
+        console.log('SUCESSSSSPATH-----------', viewerPath || previewPath);
       })
       .catch(error => {
         console.log('failure----------', error);
+        if (previewPath && previewPath !== viewerPath) {
+          FileViewer.open(previewPath, {showOpenWithDialog: true})
+            .then(() => {
+              console.log('SUCESSSSSPATH-FALLBACK-----------', previewPath);
+            })
+            .catch(fallbackError => {
+              console.log('failure-fallback----------', fallbackError);
+            });
+        }
       });
+  };
+
+  normalizeAttachmentUri = fileUri => {
+    if (!fileUri) {
+      return '';
+    }
+    if (fileUri.startsWith('content://') || fileUri.startsWith('ph://')) {
+      return fileUri;
+    }
+
+    const rawPath = fileUri.startsWith('file://')
+      ? fileUri.replace(/^file:\/\//, '')
+      : fileUri.replace(/^file:(\/\/)?/, '');
+    let decodedPath = rawPath;
+
+    try {
+      decodedPath = decodeURIComponent(rawPath);
+    } catch (error) {
+      console.log('Attachment:path decode failed', error);
+    }
+
+    const normalizedPath = decodedPath.replace(/^\/+/, '/');
+    return `file://${encodeURI(normalizedPath)}`;
+  };
+
+  getAttachmentViewerPath = fileUri => {
+    if (!fileUri) {
+      return '';
+    }
+    if (fileUri.startsWith('content://') || fileUri.startsWith('ph://')) {
+      return fileUri;
+    }
+
+    const rawPath = fileUri.startsWith('file://')
+      ? fileUri.replace(/^file:\/\//, '')
+      : fileUri.replace(/^file:(\/\/)?/, '');
+
+    try {
+      return decodeURIComponent(rawPath).replace(/^\/+/, '/');
+    } catch (error) {
+      console.log('Attachment:viewer path decode failed', error);
+      return rawPath.replace(/^\/+/, '/');
+    }
+  };
+
+  isImageAttachment = filename => {
+    if (!filename) {
+      return false;
+    }
+    const type = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'heic', 'gif'].includes(type);
+  };
+
+  openAttachmentImage = (fileData, filename) => {
+    const previewPath = this.normalizeAttachmentUri(fileData);
+    if (!previewPath) {
+      return;
+    }
+    this.setState({
+      dialogVisibleAttach: true,
+      cAttachData: previewPath,
+      cAttachType: filename,
+    });
   };
 
   getFileIcon(filename, fileData) {
@@ -1097,10 +1174,12 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
       }
     }
 
+    const attachmentUri = this.normalizeAttachmentUri(fileData);
+
     return icon === 'image' ? (
       <Image
         source={{
-          uri: 'file:/' + fileData,
+          uri: attachmentUri,
         }}
         style={{
           width: width(70),
@@ -3076,6 +3155,7 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
   };
   
   renderItem = ({item}) => {
+    const isImageFile = this.isImageAttachment(item.fileName);
     return (
       <View
         style={{
@@ -3105,7 +3185,11 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
               item.fileData !== undefined &&
               item.fileData !== null ? (
                 <TouchableOpacity
-                  onPress={this.openAttachmentFile.bind(this, item.fileData)}>
+                  onPress={() =>
+                    isImageFile
+                      ? this.openAttachmentImage(item.fileData, item.fileName)
+                      : this.openAttachmentFile(item.fileData)
+                  }>
                   {this.getFileIcon(item.fileName, item.fileData)}                 
                 </TouchableOpacity>
               ) : null}
@@ -3150,14 +3234,19 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
     console.log('FILETYPE:----------123', item.fileName);
     console.log('FILETYPE:----------123', item);
 
-    const filepath = 'file:/' + item.fileData;
+    const filepath = this.normalizeAttachmentUri(item.fileData);
+    const isImageFile = this.isImageAttachment(item.fileName);
 
     const format = item.filetype;
 
     return (
       <View>
         <TouchableOpacity
-          onPress={this.openAttachmentFile.bind(this, filepath)}>
+          onPress={() =>
+            isImageFile
+              ? this.openAttachmentImage(item.fileData, item.fileName)
+              : this.openAttachmentFile(filepath)
+          }>
           {this.getFileIcon(item.fileName, item.fileData)}
 
             {/* {format.indexOf('image') === 0 ? (
@@ -4890,8 +4979,30 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
           </View>
 
           </Modal> */}
-      
 
+          <Modal
+            isVisible={this.state.dialogVisibleAttach}
+            onBackdropPress={() => this.setState({dialogVisibleAttach: false})}
+            style={styles.modalOuterBox}>
+            <View style={styles.modalavatar}>
+              <TouchableOpacity
+                onPress={() => this.setState({dialogVisibleAttach: false})}
+                style={{backgroundColor: 'transparent', height: 60, width: 80}}>
+                <View style={{backgroundColor: 'transparent', top: 18}}>
+                  <Icon
+                    style={{left: 8}}
+                    name="times-circle"
+                    size={40}
+                    color="white"
+                  />
+                </View>
+              </TouchableOpacity>
+              <Image
+                style={styles.modelImage}
+                source={{uri: this.state.cAttachData}}
+              />
+            </View>
+          </Modal>
 
      { this.renderModel(<View style={styles.ncModal}>
               <View /* style={styles.modalBody} */>

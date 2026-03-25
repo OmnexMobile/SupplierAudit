@@ -624,6 +624,21 @@ boxContentCam: {
   // textAlign: 'center',
   // paddingLeft: 20,
 },
+modalavatar:{
+  flex:1,
+  width: width(90),
+  justifyContent:'center',
+  alignContent:'center',
+  paddingTop: 20,
+  margin: 20
+},
+modelImage: {
+  width:'100%',
+  height: '80%',
+  resizeMode: 'contain',
+  justifyContent:'center',
+  alignContent:'center'
+},
 
 
 })
