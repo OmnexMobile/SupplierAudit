@@ -44,11 +44,10 @@ class CameraCapture extends Component {
       timestamp: new Date(),
       devices: [],
       cameraType: 'back',
-      mirrorMode: false
     };
     this.camera = createRef();
     this.capturePhoto = this.capturePhoto.bind(this);
-  }roid
+  }
   componentDidMount = async () => {
     console.log('camera:capture mounted');
     const filesDir = this.getCaptureDir();
@@ -73,21 +72,33 @@ class CameraCapture extends Component {
         });
       }
     });
- 
-    const newCameraPermission = await Camera.requestCameraPermission();
-    const cameraPermission = await Camera.getCameraPermissionStatus();
-    console.log(cameraPermission, 'camerapermission');
-    if (cameraPermission !== 'authorized') {
+
+    try {
+      let cameraPermission = await Camera.getCameraPermissionStatus();
+      if (cameraPermission !== 'authorized') {
+        cameraPermission = await Camera.requestCameraPermission();
+      }
+      console.log('camera:permission', cameraPermission);
+
+      if (cameraPermission !== 'authorized') {
+        Alert.alert(
+          'Permission denied',
+          'Please grant access to camera to capture and upload',
+        );
+        return;
+      }
+
+      const {devices, backDevice, frontDevice} = await this.loadCameraDevices();
+
+      if (devices.length === 0) {
+        Alert.alert('Camera unavailable', 'No usable camera was found.');
+      }
+    } catch (error) {
+      console.log('camera:failed to initialize', error);
       Alert.alert(
-        'Permission denied',
-        'Please grant access to camera to capture and upload',
+        'Camera unavailable',
+        'Unable to open the camera on this device.',
       );
-    } else {
-      const devices = await Camera.getAvailableCameraDevices();
-      console.log(devices, 'camerapermission');
-      this.setState({
-        devices,
-      });
     }
   };
  
@@ -251,36 +262,142 @@ class CameraCapture extends Component {
       }
     });
   }
-  changeCameraType() {
-    if (this.state.cameraType === 'back') {
-      console.log("back")
-      this.setState({
-        cameraType: 'front',
-        mirrorMode: true
-      });
-    } else {
-      console.log("Front")
-      this.setState({
-        cameraType: 'back',
-        mirrorMode: false
-      });
+  waitFor = timeout =>
+    new Promise(resolve => {
+      setTimeout(resolve, timeout);
+    });
+
+  sortCameraDevices = (left, right) => {
+    let leftPoints = 0;
+    let rightPoints = 0;
+
+    const leftDevices = Array.isArray(left?.devices) ? left.devices : [];
+    const rightDevices = Array.isArray(right?.devices) ? right.devices : [];
+
+    if (leftDevices.includes('wide-angle-camera')) {
+      leftPoints += 2;
     }
+    if (rightDevices.includes('wide-angle-camera')) {
+      rightPoints += 2;
+    }
+
+    if (leftDevices.includes('telephoto-camera')) {
+      leftPoints -= 2;
+    }
+    if (rightDevices.includes('telephoto-camera')) {
+      rightPoints -= 2;
+    }
+
+    if (leftDevices.length > rightDevices.length) {
+      leftPoints += 1;
+    }
+    if (rightDevices.length > leftDevices.length) {
+      rightPoints += 1;
+    }
+
+    return rightPoints - leftPoints;
+  };
+
+  loadCameraDevices = async (attempt = 0) => {
+    let devices = await Camera.getAvailableCameraDevices();
+    devices = Array.isArray(devices) ? devices.slice().sort(this.sortCameraDevices) : [];
+
+    if (devices.length === 0 && attempt === 0) {
+      await this.waitFor(500);
+      return this.loadCameraDevices(1);
+    }
+
+    const backDevice = this.getCameraDeviceByPosition('back', devices);
+    const frontDevice = this.getCameraDeviceByPosition('front', devices);
+    const fallbackDevice = devices[0] || null;
+    const fallbackPosition =
+      fallbackDevice && String(fallbackDevice.position).toLowerCase() === 'front'
+        ? 'front'
+        : 'back';
+
+    this.setState({
+      devices,
+      cameraType: backDevice ? 'back' : frontDevice ? 'front' : fallbackPosition,
+    });
+
+    return {
+      devices,
+      backDevice,
+      frontDevice,
+    };
+  };
+
+  getCameraDeviceByPosition(position, devices = this.state.devices) {
+    const matchingDevices = (devices || []).filter(
+      device => String(device.position).toLowerCase() === position,
+    );
+    if (matchingDevices.length === 0) {
+      return null;
+    }
+
+    if (position === 'back') {
+      return (
+        matchingDevices.find(
+          device =>
+            device.isMultiCam &&
+            Array.isArray(device.devices) &&
+            device.devices.includes('wide-angle-camera'),
+        ) ||
+        matchingDevices.find(
+          device =>
+            Array.isArray(device.devices) &&
+            device.devices.includes('wide-angle-camera'),
+        ) ||
+        matchingDevices[0]
+      );
+    }
+
+    return matchingDevices[0];
   }
+
+  getActiveDevice() {
+    return (
+      this.getCameraDeviceByPosition(this.state.cameraType) ||
+      this.getCameraDeviceByPosition('back') ||
+      this.getCameraDeviceByPosition('front') ||
+      this.state.devices[0] ||
+      null
+    );
+  }
+
+  changeCameraType() {
+    const nextCameraType = this.state.cameraType === 'back' ? 'front' : 'back';
+    if (!this.getCameraDeviceByPosition(nextCameraType)) {
+      Alert.alert('Camera unavailable', `No ${nextCameraType} camera was found.`);
+      return;
+    }
+    this.setState({
+      cameraType: nextCameraType,
+    });
+  }
+  handleCameraError = error => {
+    console.log('camera:runtime error', error);
+    Alert.alert(
+      'Camera unavailable',
+      'Unable to open the camera on this device.',
+    );
+  };
+
   capturePhoto = async () => {
     var ImgPath = '';
     const captureDir = this.getCaptureDir();
-    if (this.camera) {
+    if (this.camera.current) {
       console.log('ccenter');
-      const photo = await this.camera.takePhoto({
-        qualityPrioritization: 'speed',
-        flash: 'auto',
-        // enableAutoRedEyeReduction: true
-      });
-      console.log(photo, 'camera:photoconsole');
-      let filename = photo.path.substring(photo.path.lastIndexOf('/')+1);
-      let extn = filename.substring(filename.lastIndexOf('.')+1);
-      var newfileName = 'CapturedImage_' + Moment().unix() + '.' + extn;
       try {
+        const photo = await this.camera.current.takePhoto({
+          qualityPrioritization: 'speed',
+          flash: 'auto',
+          // enableAutoRedEyeReduction: true
+        });
+        console.log(photo, 'camera:photoconsole');
+        let filename = photo.path.substring(photo.path.lastIndexOf('/')+1);
+        let extn = filename.substring(filename.lastIndexOf('.')+1);
+        var newfileName = 'CapturedImage_' + Moment().unix() + '.' + extn;
         ImgPath = this.normalizePath(photo.path);
         var data = await RNFS.readFile(
           ImgPath,
@@ -332,9 +449,12 @@ class CameraCapture extends Component {
         });
         });
  
-      }catch (err) {
-          console.log("camera:Error in Capture Image:",err);
+      } catch (err) {
+        console.log("camera:Error in Capture Image:",err);
+        Alert.alert('Capture failed', 'Unable to take a photo right now.');
       }
+    } else {
+      Alert.alert('Camera unavailable', 'The camera is still loading.');
     }
   };
  
@@ -428,14 +548,7 @@ class CameraCapture extends Component {
   }
  
   render() {
-    console.log(this.state.devices, 'devices');
-    //console.log(this.state.devices.position,"Pose")
-    console.log(this.state.captureState, 'devices');
-    console.log(this.state.capturedImagePath, 'capturedimagepath');
-    console.log(
-      'camera:capturedImageUri',
-      this.getFileUri(this.state.capturedImagePath),
-    );
+    const activeDevice = this.getActiveDevice();
     return (
       <View style={styles.wrapper}>
         <OfflineNotice />
@@ -472,21 +585,16 @@ class CameraCapture extends Component {
         </ImageBackground>
  
         <View style={styles.auditPageBody}>
-          {this.state.captureState == 'CameraMode' &&
-          this.state.devices.length > 0 ? (
+          {this.state.captureState == 'CameraMode' ? (
+            activeDevice ? (
             <Camera
-              ref={ref => {
-                this.camera = ref;
-              }}
+              ref={this.camera}
               photo={true}
               style={styles.detailsCard}
-              device={this.state.cameraType == 'back' ? this.state.devices[0] : this.state.devices[1]  }
-              zoom={1}
-              captureAudio={false}
-              autoFocus="on"
+              device={activeDevice}
+              zoom={activeDevice.neutralZoom || 1}
               isActive={true}
-              type={this.state.cameraType}
-              mirrorImage={this.state.mirrorMode}
+              onError={this.handleCameraError}
               // type={RNCamera.Constants.Type.back}
               // flashMode={RNCamera.Constants.FlashMode.on}
               // permissionDialogTitle={strings.Camera_Permission_Head}
@@ -495,6 +603,26 @@ class CameraCapture extends Component {
               //   console.log(barcodes);
               // }}
             />
+            ) : (
+              <View
+                style={{
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '100%',
+                  height: '100%',
+                }}>
+                <Text
+                  style={{
+                    fontSize: Fonts.size.regular,
+                    padding: 10,
+                    textAlign: 'center',
+                    fontFamily: 'OpenSans-Regular',
+                  }}>
+                  Loading camera...
+                </Text>
+              </View>
+            )
           ) : this.state.captureState == 'Capturing' ? (
             <View
               style={{
