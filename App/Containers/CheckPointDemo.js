@@ -3984,11 +3984,16 @@ class CheckPointDemo extends Component {
             // User - Responsibility
             if (uploadedData.RequestedByID) {
               for (var j = 0; j < dropdowns.Users.length; j++) {
-                if (uploadedData.RequestedByID == dropdowns.Users[j].userid) {
-                  requestObj = {
-                    id: dropdowns.Users[j].userid,
-                    value: dropdowns.Users[j].Name,
-                  };
+                // if (uploadedData.RequestedByID == dropdowns.Users[j].userid) {
+                //   requestObj = {
+                //     id: dropdowns.Users[j].userid,
+                //     value: dropdowns.Users[j].Name,
+                //   };
+                if (uploadedData.RequestedByID == dropdowns.RequestBy[j].AuditeeContactPersonId) {
+                                    requestObj = {
+                                        id: dropdowns.RequestBy[j].AuditeeContactPersonId,
+                                        value: dropdowns.RequestBy[j].AuditeeContactPersonName,
+                                    };
                   break;
                 }
               }

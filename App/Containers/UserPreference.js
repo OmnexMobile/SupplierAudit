@@ -212,7 +212,7 @@ class UserPreference extends React.Component {
         const redirectUri =
           Platform.OS == 'ios'
             ? 'com.omnex.suppliermanagement'
-            : 'com.omnex.auditpro';
+            : 'com.omnex.suppliermanagement';
         let myConfig = {
           issuer: this.state.ssoConfigObj.issuer, //'https://aser0001.ww.faurecia.com',
           serviceConfiguration: {
