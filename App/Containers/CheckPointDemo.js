@@ -3989,10 +3989,10 @@ class CheckPointDemo extends Component {
                 //     id: dropdowns.Users[j].userid,
                 //     value: dropdowns.Users[j].Name,
                 //   };
-                if (uploadedData.RequestedByID == dropdowns.RequestBy[j].AuditeeContactPersonId) {
+                if (uploadedData.RequestedByID == dropdowns.RequestBy[j]?.AuditeeContactPersonId) {
                                     requestObj = {
-                                        id: dropdowns.RequestBy[j].AuditeeContactPersonId,
-                                        value: dropdowns.RequestBy[j].AuditeeContactPersonName,
+                                        id: dropdowns.RequestBy[j]?.AuditeeContactPersonId,
+                                        value: dropdowns.RequestBy[j]?.AuditeeContactPersonName,
                                     };
                   break;
                 }
