@@ -235,6 +235,32 @@ class CreateNC extends Component {
     Voice.onSpeechVolumeChanged = this.onSpeechVolumeChanged;
   }
 
+  fieldHasValue = value => {
+    if (Array.isArray(value)) {
+      return value.length > 0;
+    }
+    if (value === undefined || value === null) {
+      return false;
+    }
+    if (typeof value === 'string') {
+      return value.trim().length > 0;
+    }
+    return true;
+  };
+
+  selectionHasValue = value => {
+    if (Array.isArray(value)) {
+      return value.length > 0;
+    }
+    if (value && typeof value === 'object') {
+      return (
+        this.fieldHasValue(value.id) ||
+        this.fieldHasValue(value.value)
+      );
+    }
+    return false;
+  };
+
   componentDidMount() {
     // InteractionManager.setDeadline(500);
     // InteractionManager.runAfterInteractions(() => {
@@ -375,6 +401,8 @@ class CreateNC extends Component {
   };
 
   LongTask() {
+    console.log('insidelongtask------',this.props?.navigation?.state?.params?.data);
+    
     this.setState({
       clauseMandatory:
         this.props.navigation.state.params.NCOFIDetails.clauseMandatory,
@@ -484,6 +512,20 @@ else {
 
 console.log("✅ FINAL responsibiityUser:", responsibiityUser);
 
+    const normalizedResponsibilityUser = this.selectionHasValue(
+      responsibiityUser,
+    )
+      ? responsibiityUser
+      : this.selectionHasValue(
+          this.props?.navigation?.state?.params?.data?.ResponsibilityUser,
+        )
+      ? this.props?.navigation?.state?.params?.data?.ResponsibilityUser
+      : this.selectionHasValue(
+          this.props?.navigation?.state?.params?.data?.userDrop,
+        )
+      ? this.props?.navigation?.state?.params?.data?.userDrop
+      : undefined;
+
     
     for (var i = 0; i < auditRecords.length; i++) {
       var auid =
@@ -576,9 +618,7 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
           NCcategoryt: this.props.navigation.state.params.data
             ? this.props.navigation.state.params.data.categoryDrop
             : undefined,
-          NCrequestby: this.props?.navigation?.state?.params?.data
-            ? responsibiityUser
-            : undefined, 
+          NCrequestby: normalizedResponsibilityUser,
           NCdept: this.props.navigation.state.params.data
             ? this.props.navigation.state.params.data.deptDrop
             : undefined,
@@ -2362,11 +2402,39 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
     }
   }
 
-    onSave() {
+  onSave() {
     console.log('on click save');
     console.log('faliurecategory', this.state.FailureCategory);
     console.log(this.state.clausedata, 'marcclause');
     console.log(this.state.selectedItemsProcess.length, 'selecteditemprocess',this.state.selectedItemsProcess);
+
+    const hasCategory = this.selectionHasValue(this.state.NCcategoryt);
+    const hasResponsibility = this.selectionHasValue(this.state.NCrequestby);
+    const requestedBySelection =
+      this.state.requestDropdown?.[0] || this.state.NCresponsible;
+    const hasRequestedBy = this.selectionHasValue(requestedBySelection);
+    const requestedById =
+      requestedBySelection && typeof requestedBySelection === 'object'
+        ? requestedBySelection.id
+        : undefined;
+    const hasClauseSelection = this.selectionHasValue(this.state.selectedItems);
+    const hasNonConformity = this.fieldHasValue(this.state.nonconfirmityText);
+    const hasOfiText = this.fieldHasValue(this.state.ofitext);
+    const isClauseRequired =
+      this.state.RouteParam === 'NC' &&
+      Number(this.state.clauseMandatory) === 1 &&
+      this.state.isLPA !== true;
+    const isFormValid =
+      this.state.RouteParam === 'NC'
+        ? hasCategory &&
+          hasResponsibility &&
+          hasRequestedBy &&
+          hasNonConformity &&
+          (!isClauseRequired || hasClauseSelection)
+        : hasCategory &&
+          hasResponsibility &&
+          hasRequestedBy &&
+          hasOfiText;
 
     // if(this.props.data.smdata !==2 && this.props.data.smdata !==3 ){
     //   this.setState({
@@ -2385,6 +2453,26 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
       this.setState({
         MarkClause: true,
       });
+    }
+
+    if (!isFormValid) {
+      this.setState(
+        {
+          MarkCat: !hasCategory,
+          MarkReq: !hasResponsibility,
+          MarkUser: !hasRequestedBy,
+          MarkClause: isClauseRequired && !hasClauseSelection,
+          underline1:
+            this.state.RouteParam === 'NC' ? !hasNonConformity : !hasOfiText,
+          isSaved: false,
+          PageLoader: false,
+          isSavebtn: false,
+        },
+        () => {
+          alert('Please select all mandatory fields');
+        },
+      );
+      return;
     }
     
     
@@ -2461,11 +2549,7 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
           // pcontinue 
           // this.state.displayData
         ) {
-          if (
-            this.state.selectedItems.length > 0 ||
-            this.state.selectedItems.length == 0 ||
-            this.state.isLPA == true
-          ) {
+          if (hasClauseSelection || !isClauseRequired) {
             console.log('passes...', this.state.fileArrayList);
             const fileNames = this.state.fileArrayList.map(
               file => file.fileName,
@@ -2493,7 +2577,7 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
               userDrop: this.state.NCrequestby,
               //  requestDrop: this.state.RequestArr,
               // requestDrop: this.state.NCresponsible,
-              requestDrop: this.state.requestDropdown[0].id,
+              requestDrop: requestedById,
               deptDrop: this.state.NCdept === undefined ? 0 : this.state.NCdept,
               failureDrop:
                 this.state.NCFailure === undefined
@@ -2751,24 +2835,6 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
                 },
               );
             }
-            if (
-              this.state.documentRef === undefined &&
-              this.props.data.audits.smdata != 2 &&
-              this.props.data.audits.smdata != 3
-            ) {
-              this.setState({underline1: true}, () => {
-                // --->       this.refs.toast.show(strings.NCfill,DURATION.LENGTH_LONG)
-              });
-            } else {
-              this.setState(
-                {
-                  underline1: false,
-                },
-                () => {
-                  // console.log('this.state.underline1',this.state.underline1)
-                },
-              );
-            }
             console.log(
               this.state.selectedItemsProcess.length,
               'hellothreefour',
@@ -2851,7 +2917,7 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
             categoryDrop: this.state.NCcategoryt,
             userDrop: this.state.NCrequestby,
             // requestDrop: this.state.NCresponsible,
-            requestDrop: this.state.requestDropdown[0].id,
+            requestDrop: requestedById,
             deptDrop: this.state.NCdept === undefined ? 0 : this.state.NCdept,
             failureDrop:
               this.state.NCFailure === undefined ? 0 : this.state.NCFailure,
@@ -3705,12 +3771,8 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
                               : styles.placeholderT1
                           }
                           placeholder={strings.Objective_Evidence}
-                          placeholderTextColor={
-                            this.state.underline1 === true ? 'red' : '#A9A9A9'
-                          }
-                          baseColor={
-                            this.state.underline1 === false ? '#A6A6A6' : 'red'
-                          }
+                          placeholderTextColor="#A9A9A9"
+                          baseColor="#A6A6A6"
                           textColor="#747474"
                           // underlineColorAndroid={this.state.underline1 === true ? 'red': '#A9A9A9'}
                           onChangeText={text => {
@@ -3753,12 +3815,8 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
                               : styles.placeholderT1
                           }
                           placeholder={strings.Objective_Evidence}
-                          placeholderTextColor={
-                            this.state.underline1 === true ? 'red' : '#A9A9A9'
-                          }
-                          baseColor={
-                            this.state.underline1 === false ? '#A6A6A6' : 'red'
-                          }
+                          placeholderTextColor="#A9A9A9"
+                          baseColor="#A6A6A6"
                           textColor="#747474"
                           // underlineColorAndroid={this.state.underline1 === true ? 'red': '#A9A9A9'}
                           onChangeText={text => {
@@ -3771,17 +3829,7 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
                       </View>
                     )}
 
-                    <View style={styles.check}>
-                      {this.props.data.audits.smdata !== 2 &&
-                      this.props.data.audits.smdata !== 3 ? (
-                        <Icon
-                          style={{left: 6, top: 5}}
-                          name="asterisk"
-                          size={8}
-                          color="red"
-                        />
-                      ) : null}
-                    </View>
+                    <View style={styles.check} />
                   </View>
                   <View  style={styles.input02}>
                   <Text style={{
@@ -4483,12 +4531,8 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
                               : styles.placeholderT1
                           }
                           placeholder={strings.Document_reference}
-                          placeholderTextColor={
-                            this.state.underline1 === true ? 'red' : '#A9A9A9'
-                          }
-                          baseColor={
-                            this.state.underline1 === false ? '#A6A6A6' : 'red'
-                          }
+                          placeholderTextColor="#A9A9A9"
+                          baseColor="#A6A6A6"
                           textColor="#747474"
                           // underlineColorAndroid={this.state.underline1 === true ? 'red': '#A9A9A9'}
                           onChangeText={text => {
@@ -4551,18 +4595,7 @@ console.log("✅ FINAL responsibiityUser:", responsibiityUser);
                   </TouchableOpacity> : null
 
                 } */}
-                    <View style={styles.check}>
-                      {this.state.RouteParam === 'NC' &&
-                      this.props.data.audits.smdata != 2 &&
-                      this.props.data.audits.smdata != 3 ? (
-                        <Icon
-                          style={{left: 6, top: 5}}
-                          name="asterisk"
-                          size={8}
-                          color="red"
-                        />
-                      ) : null}
-                    </View>
+                    <View style={styles.check} />
                   </View>
                   <View style={styles.div1}>
                     {/* <View style={styles.uploadButton}>
